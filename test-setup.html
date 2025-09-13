@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventar - Setup Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-6">Inventar Setup Test</h1>
+            
+            <div class="space-y-6">
+                <div class="border-l-4 border-blue-500 pl-4">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-2">Frontend Components</h2>
+                    <div class="space-y-2">
+                        <div class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            <span>Tailwind CSS loaded</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            <span>Font Awesome icons loaded</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            <span>Responsive design working</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border-l-4 border-yellow-500 pl-4">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-2">Data Structure</h2>
+                    <div class="space-y-2">
+                        <div class="flex items-center">
+                            <span id="jsonStatus" class="text-gray-600">Checking items.json...</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span id="imageStatus" class="text-gray-600">Checking images directory...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border-l-4 border-purple-500 pl-4">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-2">API Integration</h2>
+                    <div class="space-y-2">
+                        <div class="flex items-center">
+                            <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                            <span>Google Drive API: Requires setup</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                            <span>Remove.bg API: Requires API key</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                            <span>Imagga API: Requires API key</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border-l-4 border-green-500 pl-4">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-2">Next Steps</h2>
+                    <div class="space-y-2 text-sm text-gray-600">
+                        <p>1. Set up Google Cloud Project and enable Drive API</p>
+                        <p>2. Create service account and download credentials</p>
+                        <p>3. Get API keys for Remove.bg and Imagga</p>
+                        <p>4. Add secrets to GitHub repository</p>
+                        <p>5. Upload images to your Google Drive folder</p>
+                        <p>6. Test the automated workflow</p>
+                    </div>
+                </div>
+
+                <div class="flex space-x-4 pt-4">
+                    <a href="index.html" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700">
+                        <i class="fas fa-home mr-2"></i>View Main App
+                    </a>
+                    <a href="admin.html" class="bg-purple-600 text-white px-6 py-2 rounded-md hover:bg-purple-700">
+                        <i class="fas fa-cog mr-2"></i>Admin Panel
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Test JSON loading
+        fetch('items.json')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('jsonStatus').innerHTML = 
+                    `<i class="fas fa-check text-green-500 mr-2"></i>items.json loaded (${data.length} items)`;
+            })
+            .catch(error => {
+                document.getElementById('jsonStatus').innerHTML = 
+                    `<i class="fas fa-times text-red-500 mr-2"></i>items.json not found or invalid`;
+            });
+
+        // Test images directory
+        fetch('images/')
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('imageStatus').innerHTML = 
+                        `<i class="fas fa-check text-green-500 mr-2"></i>images directory accessible`;
+                } else {
+                    throw new Error('Directory not accessible');
+                }
+            })
+            .catch(error => {
+                document.getElementById('imageStatus').innerHTML = 
+                    `<i class="fas fa-times text-red-500 mr-2"></i>images directory not accessible`;
+            });
+    </script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventar - Personal Item Inventory</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .grid-item {
+            transition: transform 0.2s ease-in-out;
+        }
+        .grid-item:hover {
+            transform: scale(1.02);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            position: relative;
+            margin: 2% auto;
+            padding: 0;
+            width: 90%;
+            max-width: 800px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1001;
+        }
+        .close:hover {
+            color: #000;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .tag {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin: 2px;
+        }
+        .tag.auto {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        .tag.manual {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-6">
+                <div class="flex items-center">
+                    <h1 class="text-3xl font-bold text-gray-900">Inventar</h1>
+                    <span class="ml-3 text-sm text-gray-500">Personal Item Inventory</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span id="itemCount" class="text-sm text-gray-500">Loading...</span>
+                    <button id="refreshBtn" class="p-2 text-gray-400 hover:text-gray-600 transition-colors">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Loading State -->
+        <div id="loadingState" class="flex justify-center items-center py-12">
+            <div class="loading"></div>
+            <span class="ml-3 text-gray-600">Loading your inventory...</span>
+        </div>
+
+        <!-- Grid Container -->
+        <div id="gridContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4" style="display: none;">
+            <!-- Items will be dynamically loaded here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="text-center py-12" style="display: none;">
+            <div class="text-gray-400 mb-4">
+                <i class="fas fa-box-open text-6xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-600 mb-2">No items found</h3>
+            <p class="text-gray-500">Add some images to your Google Drive folder to get started.</p>
+        </div>
+    </main>
+
+    <!-- Modal -->
+    <div id="itemModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="modalContent">
+                <!-- Modal content will be dynamically loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

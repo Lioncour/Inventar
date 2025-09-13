@@ -1,0 +1,33 @@
+{
+  "name": "inventar",
+  "version": "1.0.0",
+  "description": "Personal Item Inventory Webpage with Automated Image Processing",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "dev": "python -m http.server 8000",
+    "build": "echo 'No build step required for static site'",
+    "deploy": "echo 'Deploy to GitHub Pages'"
+  },
+  "keywords": [
+    "inventory",
+    "personal",
+    "items",
+    "image-processing",
+    "automation"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "@google-cloud/storage": "^7.7.0",
+    "googleapis": "^128.0.0",
+    "axios": "^1.6.0",
+    "form-data": "^4.0.0"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/inventar.git"
+  },
+  "homepage": "https://yourusername.github.io/inventar"
+}

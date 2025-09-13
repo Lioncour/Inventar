@@ -1,0 +1,26 @@
+[
+  {
+    "id": "2024-01-15T10:30:00.000Z",
+    "imageUrl": "images/sample-item-1.png",
+    "tags": {
+      "auto": ["color:blue", "size:medium"],
+      "manual": ["vintage", "electronics"]
+    }
+  },
+  {
+    "id": "2024-01-15T11:45:00.000Z",
+    "imageUrl": "images/sample-item-2.png",
+    "tags": {
+      "auto": ["color:red", "size:small"],
+      "manual": ["gift", "handmade"]
+    }
+  },
+  {
+    "id": "2024-01-15T14:20:00.000Z",
+    "imageUrl": "images/sample-item-3.png",
+    "tags": {
+      "auto": ["color:green", "size:large"],
+      "manual": []
+    }
+  }
+]

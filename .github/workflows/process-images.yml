@@ -1,0 +1,56 @@
+name: Process New Images
+
+on:
+  schedule:
+    # Run every hour
+    - cron: '0 * * * *'
+  workflow_dispatch:
+    # Allow manual triggering
+  push:
+    paths:
+      - 'items.json'
+
+jobs:
+  process-images:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      run: |
+        npm init -y
+        npm install @google-cloud/storage googleapis axios form-data
+
+    - name: Create images directory
+      run: mkdir -p images
+
+    - name: Process new images
+      env:
+        GOOGLE_DRIVE_FOLDER_ID: ${{ secrets.GOOGLE_DRIVE_FOLDER_ID }}
+        GOOGLE_SERVICE_ACCOUNT_KEY: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}
+        REMOVE_BG_API_KEY: ${{ secrets.REMOVE_BG_API_KEY }}
+        IMAGGA_API_KEY: ${{ secrets.IMAGGA_API_KEY }}
+        IMAGGA_API_SECRET: ${{ secrets.IMAGGA_API_SECRET }}
+      run: node process-images.js
+
+    - name: Commit changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add .
+        if git diff --staged --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m "Auto-update: Process new images from Google Drive"
+          git push
+        fi

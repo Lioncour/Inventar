@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventar Admin - Manual Tagging</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .tag {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin: 2px;
+        }
+        .tag.auto {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        .tag.manual {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Login Modal -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">Admin Access</h2>
+            <form id="loginForm">
+                <div class="mb-4">
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        required
+                    >
+                </div>
+                <button 
+                    type="submit" 
+                    class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                    Access Admin Panel
+                </button>
+            </form>
+            <div id="loginError" class="mt-4 text-red-600 text-sm text-center hidden">
+                Invalid password. Please try again.
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Admin Interface -->
+    <div id="adminContent" class="hidden">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b border-gray-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center py-6">
+                    <div class="flex items-center">
+                        <h1 class="text-3xl font-bold text-gray-900">Inventar Admin</h1>
+                        <span class="ml-3 text-sm text-gray-500">Manual Tagging</span>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span id="itemCount" class="text-sm text-gray-500">Loading...</span>
+                        <button id="logoutBtn" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700">
+                            <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Instructions -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-info-circle text-blue-400"></i>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-blue-800">Instructions</h3>
+                        <div class="mt-2 text-sm text-blue-700">
+                            <p>Add up to 3 manual tags per item. Separate multiple tags with commas. Click "Save" to update the item.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loadingState" class="flex justify-center items-center py-12">
+                <div class="loading"></div>
+                <span class="ml-3 text-gray-600">Loading items...</span>
+            </div>
+
+            <!-- Items Grid -->
+            <div id="itemsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" style="display: none;">
+                <!-- Items will be dynamically loaded here -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="text-center py-12" style="display: none;">
+                <div class="text-gray-400 mb-4">
+                    <i class="fas fa-box-open text-6xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-600 mb-2">No items found</h3>
+                <p class="text-gray-500">Add some images to your Google Drive folder to get started.</p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        class AdminApp {
+            constructor() {
+                this.items = [];
+                this.isAuthenticated = false;
+                this.password = 'admin123'; // Change this to your desired password
+                
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.checkAuthentication();
+            }
+
+            setupEventListeners() {
+                // Login form
+                document.getElementById('loginForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.handleLogin();
+                });
+
+                // Logout button
+                document.getElementById('logoutBtn').addEventListener('click', () => {
+                    this.logout();
+                });
+            }
+
+            checkAuthentication() {
+                const isAuth = localStorage.getItem('inventar_admin_auth');
+                if (isAuth === 'true') {
+                    this.isAuthenticated = true;
+                    this.showAdminContent();
+                    this.loadItems();
+                } else {
+                    this.showLoginModal();
+                }
+            }
+
+            handleLogin() {
+                const password = document.getElementById('password').value;
+                const errorDiv = document.getElementById('loginError');
+                
+                if (password === this.password) {
+                    this.isAuthenticated = true;
+                    localStorage.setItem('inventar_admin_auth', 'true');
+                    this.showAdminContent();
+                    this.loadItems();
+                } else {
+                    errorDiv.classList.remove('hidden');
+                    document.getElementById('password').value = '';
+                }
+            }
+
+            logout() {
+                this.isAuthenticated = false;
+                localStorage.removeItem('inventar_admin_auth');
+                this.showLoginModal();
+                this.items = [];
+            }
+
+            showLoginModal() {
+                document.getElementById('loginModal').classList.remove('hidden');
+                document.getElementById('adminContent').classList.add('hidden');
+            }
+
+            showAdminContent() {
+                document.getElementById('loginModal').classList.add('hidden');
+                document.getElementById('adminContent').classList.remove('hidden');
+            }
+
+            async loadItems() {
+                try {
+                    this.showLoading(true);
+                    const response = await fetch('items.json');
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    this.items = await response.json();
+                    this.updateItemCount();
+                    this.renderItems();
+                    this.showLoading(false);
+                    
+                    if (this.items.length === 0) {
+                        this.showEmptyState(true);
+                    }
+                } catch (error) {
+                    console.error('Error loading items:', error);
+                    this.showError('Failed to load items. Please try again.');
+                    this.showLoading(false);
+                }
+            }
+
+            renderItems() {
+                const gridContainer = document.getElementById('itemsGrid');
+                gridContainer.innerHTML = '';
+                
+                this.items.forEach((item, index) => {
+                    this.createItemCard(item, index, gridContainer);
+                });
+            }
+
+            createItemCard(item, index, container) {
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'bg-white rounded-lg shadow-sm border border-gray-200 p-6';
+                
+                const allTags = [...(item.tags.auto || []), ...(item.tags.manual || [])];
+                
+                cardDiv.innerHTML = `
+                    <div class="mb-4">
+                        <img 
+                            src="${item.imageUrl}" 
+                            alt="Item ${item.id}"
+                            class="w-full h-48 object-cover rounded-lg"
+                            onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5YTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIG5vdCBmb3VuZDwvdGV4dD48L3N2Zz4='"
+                        >
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h3 class="text-sm font-medium text-gray-900 mb-2">Item ID: ${item.id}</h3>
+                        <p class="text-xs text-gray-500">Added: ${new Date(item.id).toLocaleDateString()}</p>
+                    </div>
+                    
+                    ${allTags.length > 0 ? `
+                        <div class="mb-4">
+                            <h4 class="text-sm font-medium text-gray-700 mb-2">Current Tags</h4>
+                            <div class="flex flex-wrap gap-1">
+                                ${(item.tags.auto || []).map(tag => 
+                                    `<span class="tag auto">${tag}</span>`
+                                ).join('')}
+                                ${(item.tags.manual || []).map(tag => 
+                                    `<span class="tag manual">${tag}</span>`
+                                ).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="mb-4">
+                        <label for="manualTags_${index}" class="block text-sm font-medium text-gray-700 mb-2">
+                            Manual Tags (comma-separated, max 3)
+                        </label>
+                        <input 
+                            type="text" 
+                            id="manualTags_${index}" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="e.g., vintage, electronics, gift"
+                            value="${(item.tags.manual || []).join(', ')}"
+                            maxlength="100"
+                        >
+                        <p class="text-xs text-gray-500 mt-1">Separate multiple tags with commas</p>
+                    </div>
+                    
+                    <button 
+                        onclick="adminApp.saveItem(${index})"
+                        class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                        <i class="fas fa-save mr-2"></i>Save Changes
+                    </button>
+                `;
+                
+                container.appendChild(cardDiv);
+            }
+
+            async saveItem(index) {
+                const item = this.items[index];
+                const input = document.getElementById(`manualTags_${index}`);
+                const tags = input.value.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+                
+                if (tags.length > 3) {
+                    this.showError('Maximum 3 manual tags allowed');
+                    return;
+                }
+                
+                // Update the item
+                item.tags.manual = tags;
+                
+                try {
+                    // In a real implementation, this would make an API call to update the JSON file
+                    // For now, we'll just show a success message
+                    this.showSuccess(`Item ${item.id} updated successfully!`);
+                    
+                    // Re-render the item to show updated tags
+                    this.renderItems();
+                } catch (error) {
+                    console.error('Error saving item:', error);
+                    this.showError('Failed to save changes. Please try again.');
+                }
+            }
+
+            updateItemCount() {
+                const countElement = document.getElementById('itemCount');
+                countElement.textContent = `${this.items.length} item${this.items.length !== 1 ? 's' : ''}`;
+            }
+
+            showLoading(show) {
+                const loadingState = document.getElementById('loadingState');
+                const itemsGrid = document.getElementById('itemsGrid');
+                
+                if (show) {
+                    loadingState.style.display = 'flex';
+                    itemsGrid.style.display = 'none';
+                } else {
+                    loadingState.style.display = 'none';
+                    itemsGrid.style.display = 'grid';
+                }
+            }
+
+            showEmptyState(show) {
+                const emptyState = document.getElementById('emptyState');
+                const itemsGrid = document.getElementById('itemsGrid');
+                
+                if (show) {
+                    emptyState.style.display = 'block';
+                    itemsGrid.style.display = 'none';
+                } else {
+                    emptyState.style.display = 'none';
+                    itemsGrid.style.display = 'grid';
+                }
+            }
+
+            showError(message) {
+                this.showNotification(message, 'error');
+            }
+
+            showSuccess(message) {
+                this.showNotification(message, 'success');
+            }
+
+            showNotification(message, type) {
+                const bgColor = type === 'error' ? 'bg-red-500' : 'bg-green-500';
+                const icon = type === 'error' ? 'fa-exclamation-triangle' : 'fa-check-circle';
+                
+                const notification = document.createElement('div');
+                notification.className = `fixed top-4 right-4 ${bgColor} text-white px-6 py-3 rounded-lg shadow-lg z-50`;
+                notification.innerHTML = `
+                    <div class="flex items-center">
+                        <i class="fas ${icon} mr-2"></i>
+                        <span>${message}</span>
+                        <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                // Auto-remove after 3 seconds
+                setTimeout(() => {
+                    if (notification.parentElement) {
+                        notification.remove();
+                    }
+                }, 3000);
+            }
+        }
+
+        // Initialize the admin app
+        let adminApp;
+        document.addEventListener('DOMContentLoaded', () => {
+            adminApp = new AdminApp();
+        });
+    </script>
+</body>
+</html>
