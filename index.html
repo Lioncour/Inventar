@@ -7,11 +7,28 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            line-height: 1.4;
+        }
+        
         .grid-item {
-            transition: transform 0.2s ease-in-out, opacity 0.3s ease-in-out;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 3px solid #ffffff;
+            background: #ffffff;
         }
         .grid-item:hover {
-            transform: scale(1.02);
+            transform: translateY(-8px) scale(1.02);
+            border-color: #ff6b35;
+            box-shadow: 0 20px 40px rgba(255, 107, 53, 0.3);
         }
         #gridContainer {
             transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
@@ -24,8 +41,8 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.8);
-            backdrop-filter: blur(5px);
+            background-color: rgba(0,0,0,0.95);
+            backdrop-filter: blur(10px);
         }
         .modal-content {
             position: relative;
@@ -33,31 +50,39 @@
             padding: 0;
             width: 90%;
             max-width: 800px;
-            background: white;
-            border-radius: 12px;
+            background: #ffffff;
+            border: 4px solid #000000;
             overflow: hidden;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 0 0 4px #ff6b35, 0 20px 40px rgba(0, 0, 0, 0.5);
         }
         .close {
             position: absolute;
-            top: 15px;
+            top: 20px;
             right: 20px;
-            color: #aaa;
-            font-size: 28px;
-            font-weight: bold;
+            color: #000000;
+            font-size: 32px;
+            font-weight: 800;
             cursor: pointer;
             z-index: 1001;
+            font-family: 'JetBrains Mono', monospace;
+            background: #ff6b35;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid #000000;
         }
         .close:hover {
-            color: #000;
+            background: #000000;
+            color: #ff6b35;
         }
         .loading {
             display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #3498db;
-            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            border: 4px solid #333333;
+            border-top: 4px solid #ff6b35;
             animation: spin 1s linear infinite;
         }
         @keyframes spin {
@@ -66,58 +91,228 @@
         }
         .tag {
             display: inline-block;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.875rem;
-            font-weight: 500;
+            background: #000000;
+            color: #ffffff;
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
             margin: 2px;
+            border: 2px solid #000000;
+            font-family: 'JetBrains Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         .tag.auto {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            background: #ff6b35;
+            color: #000000;
         }
         .tag.manual {
-            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            background: #ffffff;
+            color: #000000;
+            border-color: #000000;
         }
         .filter-option {
-            padding: 8px 16px;
-            border: 2px solid #e5e7eb;
-            border-radius: 20px;
-            background: white;
-            color: #374151;
+            padding: 12px 20px;
+            border: 3px solid #ffffff;
+            background: #000000;
+            color: #ffffff;
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.2s ease-in-out;
+            font-family: 'JetBrains Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         .filter-option:hover {
-            border-color: #3b82f6;
-            color: #3b82f6;
+            background: #ff6b35;
+            color: #000000;
+            transform: translateY(-2px);
         }
         .filter-option.active {
-            background: #3b82f6;
-            border-color: #3b82f6;
-            color: white;
+            background: #ff6b35;
+            border-color: #ff6b35;
+            color: #000000;
         }
         .filter-chip {
             display: inline-flex;
             align-items: center;
-            padding: 4px 12px;
-            background: #3b82f6;
-            color: white;
-            border-radius: 16px;
+            padding: 8px 16px;
+            background: #ff6b35;
+            color: #000000;
             font-size: 12px;
-            font-weight: 500;
+            font-weight: 700;
             margin: 2px;
+            border: 2px solid #000000;
+            font-family: 'JetBrains Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         .filter-chip .remove {
-            margin-left: 6px;
+            margin-left: 8px;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 800;
+            font-size: 16px;
         }
         .filter-chip .remove:hover {
-            color: #fbbf24;
+            color: #ffffff;
+        }
+        
+        /* Brutalist Header */
+        header {
+            background: #000000;
+            border-bottom: 6px solid #ff6b35;
+            box-shadow: 0 4px 0 #ffffff;
+        }
+        
+        /* Brutalist Buttons */
+        button {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease-in-out;
+        }
+        
+        #filterBtn, #aboutBtn {
+            background: #000000;
+            color: #ffffff;
+            border: 3px solid #ffffff;
+            padding: 12px 20px;
+            font-size: 14px;
+        }
+        
+        #filterBtn:hover, #aboutBtn:hover {
+            background: #ff6b35;
+            color: #000000;
+            transform: translateY(-2px);
+        }
+        
+        #clearFiltersBtn {
+            background: #333333;
+            color: #ffffff;
+            border: 2px solid #666666;
+            padding: 8px 16px;
+            font-size: 12px;
+        }
+        
+        #clearFiltersBtn:hover {
+            background: #ff6b35;
+            color: #000000;
+            border-color: #ff6b35;
+        }
+        
+        /* Brutalist Grid */
+        #gridContainer {
+            gap: 16px;
+        }
+        
+        .grid-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border: 2px solid #000000;
+        }
+        
+        /* Brutalist Typography */
+        h1 {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #ff6b35;
+            text-shadow: 3px 3px 0 #ffffff;
+        }
+        
+        #itemCount {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 500;
+            color: #cccccc;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* Brutalist Modals */
+        .modal-content h2 {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #000000;
+        }
+        
+        .modal-content h3 {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #000000;
+        }
+        
+        /* Brutalist Form Elements */
+        input, select {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 500;
+            border: 3px solid #000000;
+            background: #ffffff;
+            color: #000000;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #ff6b35;
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.3);
+        }
+        
+        /* Brutalist Cards */
+        .bg-white {
+            background: #ffffff !important;
+            border: 3px solid #000000;
+        }
+        
+        .text-gray-900 {
+            color: #000000 !important;
+        }
+        
+        .text-gray-700 {
+            color: #333333 !important;
+        }
+        
+        .text-gray-600 {
+            color: #666666 !important;
+        }
+        
+        .text-gray-500 {
+            color: #999999 !important;
+        }
+        
+        /* Brutalist Backgrounds */
+        .bg-gray-50 {
+            background: #0a0a0a !important;
+        }
+        
+        .bg-blue-50 {
+            background: #ff6b35 !important;
+            color: #000000 !important;
+        }
+        
+        .bg-blue-100 {
+            background: #000000 !important;
+            color: #ff6b35 !important;
+        }
+        
+        .border-blue-200 {
+            border-color: #000000 !important;
+        }
+        
+        .text-blue-800 {
+            color: #000000 !important;
+        }
+        
+        .text-blue-900 {
+            color: #000000 !important;
         }
     </style>
 </head>
