@@ -3,23 +3,170 @@
     "id": "2024-01-15T10:30:00.000Z",
     "imageUrl": "images/sample-item-1.png",
     "tags": {
-      "auto": ["color:blue", "size:medium"],
-      "manual": ["vintage", "electronics"]
+      "auto": [
+        "color:blue",
+        "size:medium"
+      ],
+      "manual": [
+        "vintage",
+        "electronics"
+      ]
     }
   },
   {
     "id": "2024-01-15T11:45:00.000Z",
     "imageUrl": "images/sample-item-2.png",
     "tags": {
-      "auto": ["color:red", "size:small"],
-      "manual": ["gift", "handmade"]
+      "auto": [
+        "color:red",
+        "size:small"
+      ],
+      "manual": [
+        "gift",
+        "handmade"
+      ]
     }
   },
   {
     "id": "2024-01-15T14:20:00.000Z",
     "imageUrl": "images/sample-item-3.png",
     "tags": {
-      "auto": ["color:green", "size:large"],
+      "auto": [
+        "color:green",
+        "size:large"
+      ],
+      "manual": []
+    }
+  },
+  {
+    "id": "2025-09-13T22:58:15.457Z",
+    "imageUrl": "images/DSCF0001.JPG",
+    "tags": {
+      "auto": [
+        "color:unknown",
+        "size:medium"
+      ],
+      "manual": []
+    }
+  },
+  {
+    "id": "2025-09-13T22:58:21.157Z",
+    "imageUrl": "images/DSCF0056.JPG",
+    "tags": {
+      "auto": [
+        "color:unknown",
+        "size:medium"
+      ],
+      "manual": []
+    }
+  },
+  {
+    "id": "2025-09-13T22:58:25.629Z",
+    "imageUrl": "images/DSCF0054.JPG",
+    "tags": {
+      "auto": [
+        "color:unknown",
+        "size:medium"
+      ],
+      "manual": []
+    }
+  },
+  {
+    "id": "2025-09-13T22:58:27.946Z",
+    "imageUrl": "images/insp logans heroes.png",
+    "tags": {
+      "auto": [
+        "color:unknown",
+        "size:medium"
+      ],
+      "manual": []
+    }
+  },
+  {
+    "id": "2025-09-13T22:58:30.143Z",
+    "imageUrl": "images/e22b17b4445542629903462ffe8ad00f.jpg",
+    "tags": {
+      "auto": [
+        "color:unknown",
+        "size:medium"
+      ],
+      "manual": []
+    }
+  },
+  {
+    "id": "2025-09-13T22:58:31.728Z",
+    "imageUrl": "images/714ec9af5f244783be875f51edc06298.jpg",
+    "tags": {
+      "auto": [
+        "color:unknown",
+        "size:medium"
+      ],
+      "manual": []
+    }
+  },
+  {
+    "id": "2025-09-13T22:58:33.962Z",
+    "imageUrl": "images/5b93706676aa42708382fb5036278f70.jpg",
+    "tags": {
+      "auto": [
+        "color:unknown",
+        "size:medium"
+      ],
+      "manual": []
+    }
+  },
+  {
+    "id": "2025-09-13T22:58:35.485Z",
+    "imageUrl": "images/820c280695e56bf7c64dbb907fad3f41.jpg",
+    "tags": {
+      "auto": [
+        "color:unknown",
+        "size:medium"
+      ],
+      "manual": []
+    }
+  },
+  {
+    "id": "2025-09-14T07:18:41.784Z",
+    "imageUrl": "images/Screenshot_20250912_083621_processed.png",
+    "tags": {
+      "auto": [
+        "color:unknown",
+        "size:medium"
+      ],
+      "manual": []
+    }
+  },
+  {
+    "id": "2025-09-14T07:18:45.796Z",
+    "imageUrl": "images/20250720_141256_processed.png",
+    "tags": {
+      "auto": [
+        "color:unknown",
+        "size:medium"
+      ],
+      "manual": []
+    }
+  },
+  {
+    "id": "2025-09-14T07:26:11.379Z",
+    "imageUrl": "images/Screenshot_20250912_083621_processed.png",
+    "tags": {
+      "auto": [
+        "color:unknown",
+        "size:medium"
+      ],
+      "manual": []
+    }
+  },
+  {
+    "id": "2025-09-14T07:26:14.366Z",
+    "imageUrl": "images/20250720_141256_processed.png",
+    "tags": {
+      "auto": [
+        "color:unknown",
+        "size:medium"
+      ],
       "manual": []
     }
   }
