@@ -7,6 +7,12 @@ class InventarApp {
         this.isLoading = false;
         this.hasMoreItems = true;
         this.currentSort = 'newest';
+        this.activeFilters = {
+            color: [],
+            size: [],
+            room: [],
+            price: []
+        };
         
         this.init();
     }
@@ -24,6 +30,31 @@ class InventarApp {
             this.sortItems();
         });
 
+        // Filter functionality
+        document.getElementById('filterBtn').addEventListener('click', () => {
+            this.openFilterModal();
+        });
+
+        document.getElementById('clearFiltersBtn').addEventListener('click', () => {
+            this.clearAllFilters();
+        });
+
+        // Filter modal events
+        document.getElementById('applyFilters').addEventListener('click', () => {
+            this.applyFilters();
+        });
+
+        document.getElementById('clearAllFilters').addEventListener('click', () => {
+            this.clearAllFilters();
+        });
+
+        // Filter option clicks
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('filter-option')) {
+                this.toggleFilterOption(e.target);
+            }
+        });
+
         // About modal
         document.getElementById('aboutBtn').addEventListener('click', () => {
             this.openAboutModal();
@@ -32,12 +63,14 @@ class InventarApp {
         // Modal close events
         const itemModal = document.getElementById('itemModal');
         const aboutModal = document.getElementById('aboutModal');
+        const filterModal = document.getElementById('filterModal');
         const closeBtns = document.querySelectorAll('.close');
         
         closeBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 this.closeModal();
                 this.closeAboutModal();
+                this.closeFilterModal();
             });
         });
 
@@ -53,11 +86,18 @@ class InventarApp {
             }
         });
 
+        filterModal.addEventListener('click', (e) => {
+            if (e.target === filterModal) {
+                this.closeFilterModal();
+            }
+        });
+
         // Escape key to close modals
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 this.closeModal();
                 this.closeAboutModal();
+                this.closeFilterModal();
             }
         });
     }
@@ -252,6 +292,183 @@ class InventarApp {
         const modal = document.getElementById('aboutModal');
         modal.style.display = 'none';
         document.body.style.overflow = 'auto';
+    }
+
+    openFilterModal() {
+        const modal = document.getElementById('filterModal');
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+        this.updateFilterOptions();
+    }
+
+    closeFilterModal() {
+        const modal = document.getElementById('filterModal');
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+    toggleFilterOption(option) {
+        const type = option.dataset.type;
+        const value = option.dataset.value;
+        
+        if (this.activeFilters[type].includes(value)) {
+            this.activeFilters[type] = this.activeFilters[type].filter(v => v !== value);
+            option.classList.remove('active');
+        } else {
+            this.activeFilters[type].push(value);
+            option.classList.add('active');
+        }
+    }
+
+    updateFilterOptions() {
+        // Update filter option states based on active filters
+        document.querySelectorAll('.filter-option').forEach(option => {
+            const type = option.dataset.type;
+            const value = option.dataset.value;
+            
+            if (this.activeFilters[type].includes(value)) {
+                option.classList.add('active');
+            } else {
+                option.classList.remove('active');
+            }
+        });
+    }
+
+    applyFilters() {
+        this.filterItems();
+        this.closeFilterModal();
+    }
+
+    clearAllFilters() {
+        this.activeFilters = {
+            color: [],
+            size: [],
+            room: [],
+            price: []
+        };
+        
+        // Update UI
+        document.querySelectorAll('.filter-option').forEach(option => {
+            option.classList.remove('active');
+        });
+        
+        this.filterItems();
+        this.closeFilterModal();
+    }
+
+    filterItems() {
+        const gridContainer = document.getElementById('gridContainer');
+        
+        // Add filtering animation
+        gridContainer.style.opacity = '0.5';
+        gridContainer.style.transform = 'scale(0.98)';
+        
+        setTimeout(() => {
+            this.filteredItems = this.items.filter(item => {
+                return this.itemMatchesFilters(item);
+            });
+            
+            this.currentPage = 0;
+            this.hasMoreItems = this.filteredItems.length > 0;
+            
+            this.sortItems();
+            this.updateActiveFiltersDisplay();
+            
+            // Complete animation
+            gridContainer.style.opacity = '1';
+            gridContainer.style.transform = 'scale(1)';
+        }, 200);
+    }
+
+    itemMatchesFilters(item) {
+        const allTags = [...(item.tags.auto || []), ...(item.tags.manual || [])];
+        
+        // Check color filter
+        if (this.activeFilters.color.length > 0) {
+            const itemColor = this.getTagValue(item, 'color');
+            if (!itemColor || !this.activeFilters.color.includes(itemColor.toLowerCase())) {
+                return false;
+            }
+        }
+        
+        // Check size filter
+        if (this.activeFilters.size.length > 0) {
+            const itemSize = this.getTagValue(item, 'size');
+            if (!itemSize || !this.activeFilters.size.includes(itemSize.toLowerCase())) {
+                return false;
+            }
+        }
+        
+        // Check room filter
+        if (this.activeFilters.room.length > 0) {
+            const itemRoom = this.getTagValue(item, 'room');
+            if (!itemRoom || !this.activeFilters.room.includes(itemRoom.toLowerCase())) {
+                return false;
+            }
+        }
+        
+        // Check price filter
+        if (this.activeFilters.price.length > 0) {
+            const itemPrice = parseFloat(this.getTagValue(item, 'price')) || 0;
+            let priceMatches = false;
+            
+            for (const priceRange of this.activeFilters.price) {
+                if (priceRange === '0-25' && itemPrice >= 0 && itemPrice <= 25) priceMatches = true;
+                else if (priceRange === '25-50' && itemPrice > 25 && itemPrice <= 50) priceMatches = true;
+                else if (priceRange === '50-100' && itemPrice > 50 && itemPrice <= 100) priceMatches = true;
+                else if (priceRange === '100-200' && itemPrice > 100 && itemPrice <= 200) priceMatches = true;
+                else if (priceRange === '200+' && itemPrice > 200) priceMatches = true;
+            }
+            
+            if (!priceMatches) return false;
+        }
+        
+        return true;
+    }
+
+    updateActiveFiltersDisplay() {
+        const activeFiltersDiv = document.getElementById('activeFilters');
+        const filterChipsDiv = document.getElementById('filterChips');
+        const clearFiltersBtn = document.getElementById('clearFiltersBtn');
+        
+        // Clear existing chips
+        filterChipsDiv.innerHTML = '';
+        
+        // Check if any filters are active
+        const hasActiveFilters = Object.values(this.activeFilters).some(filters => filters.length > 0);
+        
+        if (hasActiveFilters) {
+            activeFiltersDiv.style.display = 'block';
+            clearFiltersBtn.style.display = 'inline-block';
+            
+            // Add filter chips
+            Object.entries(this.activeFilters).forEach(([type, values]) => {
+                values.forEach(value => {
+                    const chip = document.createElement('div');
+                    chip.className = 'filter-chip';
+                    chip.innerHTML = `
+                        ${type}: ${value}
+                        <span class="remove" data-type="${type}" data-value="${value}">&times;</span>
+                    `;
+                    
+                    // Add remove functionality
+                    chip.querySelector('.remove').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.removeFilter(type, value);
+                    });
+                    
+                    filterChipsDiv.appendChild(chip);
+                });
+            });
+        } else {
+            activeFiltersDiv.style.display = 'none';
+            clearFiltersBtn.style.display = 'none';
+        }
+    }
+
+    removeFilter(type, value) {
+        this.activeFilters[type] = this.activeFilters[type].filter(v => v !== value);
+        this.filterItems();
     }
 
     setupInfiniteScroll() {

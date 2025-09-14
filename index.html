@@ -80,6 +80,45 @@
         .tag.manual {
             background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
         }
+        .filter-option {
+            padding: 8px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 20px;
+            background: white;
+            color: #374151;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+        .filter-option:hover {
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+        .filter-option.active {
+            background: #3b82f6;
+            border-color: #3b82f6;
+            color: white;
+        }
+        .filter-chip {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            background: #3b82f6;
+            color: white;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            margin: 2px;
+        }
+        .filter-chip .remove {
+            margin-left: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .filter-chip .remove:hover {
+            color: #fbbf24;
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -103,6 +142,14 @@
                             <option value="price">Price</option>
                         </select>
                     </div>
+                    <div class="flex items-center space-x-2">
+                        <button id="filterBtn" class="text-gray-600 hover:text-gray-900 transition-colors font-medium">
+                            <i class="fas fa-filter mr-1"></i>Filters
+                        </button>
+                        <button id="clearFiltersBtn" class="text-gray-400 hover:text-gray-600 transition-colors text-sm" style="display: none;">
+                            Clear All
+                        </button>
+                    </div>
                     <button id="aboutBtn" class="text-gray-600 hover:text-gray-900 transition-colors font-medium">
                         About
                     </button>
@@ -113,6 +160,16 @@
 
     <!-- Main Content -->
     <main class="pt-20 px-4 sm:px-6 lg:px-8 pb-8">
+        <!-- Active Filters -->
+        <div id="activeFilters" class="mb-4" style="display: none;">
+            <div class="flex flex-wrap gap-2 items-center">
+                <span class="text-sm text-gray-600">Active filters:</span>
+                <div id="filterChips" class="flex flex-wrap gap-2">
+                    <!-- Filter chips will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+
         <!-- Loading State -->
         <div id="loadingState" class="flex justify-center items-center py-12">
             <div class="loading"></div>
@@ -144,6 +201,81 @@
         </div>
     </div>
 
+    <!-- Filter Modal -->
+    <div id="filterModal" class="modal">
+        <div class="modal-content max-w-2xl">
+            <span class="close" id="filterClose">&times;</span>
+            <div class="p-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Filter Items</h2>
+                
+                <div class="space-y-6">
+                    <!-- Color Filter -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3">Color</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <button class="filter-option" data-type="color" data-value="red">Red</button>
+                            <button class="filter-option" data-type="color" data-value="blue">Blue</button>
+                            <button class="filter-option" data-type="color" data-value="green">Green</button>
+                            <button class="filter-option" data-type="color" data-value="yellow">Yellow</button>
+                            <button class="filter-option" data-type="color" data-value="purple">Purple</button>
+                            <button class="filter-option" data-type="color" data-value="orange">Orange</button>
+                            <button class="filter-option" data-type="color" data-value="pink">Pink</button>
+                            <button class="filter-option" data-type="color" data-value="brown">Brown</button>
+                            <button class="filter-option" data-type="color" data-value="gray">Gray</button>
+                            <button class="filter-option" data-type="color" data-value="black">Black</button>
+                        </div>
+                    </div>
+
+                    <!-- Size Filter -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3">Size</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <button class="filter-option" data-type="size" data-value="tiny">Tiny</button>
+                            <button class="filter-option" data-type="size" data-value="small">Small</button>
+                            <button class="filter-option" data-type="size" data-value="medium">Medium</button>
+                            <button class="filter-option" data-type="size" data-value="large">Large</button>
+                            <button class="filter-option" data-type="size" data-value="huge">Huge</button>
+                        </div>
+                    </div>
+
+                    <!-- Room Filter -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3">Room</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <button class="filter-option" data-type="room" data-value="bedroom">Bedroom</button>
+                            <button class="filter-option" data-type="room" data-value="living room">Living Room</button>
+                            <button class="filter-option" data-type="room" data-value="kitchen">Kitchen</button>
+                            <button class="filter-option" data-type="room" data-value="bathroom">Bathroom</button>
+                            <button class="filter-option" data-type="room" data-value="office">Office</button>
+                            <button class="filter-option" data-type="room" data-value="garage">Garage</button>
+                        </div>
+                    </div>
+
+                    <!-- Price Range Filter -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3">Price Range</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <button class="filter-option" data-type="price" data-value="0-25">$0 - $25</button>
+                            <button class="filter-option" data-type="price" data-value="25-50">$25 - $50</button>
+                            <button class="filter-option" data-type="price" data-value="50-100">$50 - $100</button>
+                            <button class="filter-option" data-type="price" data-value="100-200">$100 - $200</button>
+                            <button class="filter-option" data-type="price" data-value="200+">$200+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button id="clearAllFilters" class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors">
+                        Clear All
+                    </button>
+                    <button id="applyFilters" class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                        Apply Filters
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- About Modal -->
     <div id="aboutModal" class="modal">
         <div class="modal-content max-w-2xl">
@@ -164,6 +296,7 @@
                             <li><strong>AI Tagging:</strong> Automatic color and size detection</li>
                             <li><strong>Custom Tags:</strong> Add your own tags for size, color, price, and room location</li>
                             <li><strong>Smart Sorting:</strong> Sort items by various criteria with smooth animations</li>
+                            <li><strong>Multi-Filter System:</strong> Filter by multiple criteria simultaneously</li>
                             <li><strong>Responsive Design:</strong> Works perfectly on all devices</li>
                         </ul>
                     </div>
