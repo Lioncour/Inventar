@@ -147,5 +147,27 @@
       ],
       "manual": []
     }
+  },
+  {
+    "id": "2025-09-14T07:26:11.379Z",
+    "imageUrl": "images/Screenshot_20250912_083621_processed.png",
+    "tags": {
+      "auto": [
+        "color:unknown",
+        "size:medium"
+      ],
+      "manual": []
+    }
+  },
+  {
+    "id": "2025-09-14T07:26:14.366Z",
+    "imageUrl": "images/20250720_141256_processed.png",
+    "tags": {
+      "auto": [
+        "color:unknown",
+        "size:medium"
+      ],
+      "manual": []
+    }
   }
 ]
