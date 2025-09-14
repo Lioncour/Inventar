@@ -6,7 +6,6 @@ class InventarApp {
         this.itemsPerPage = 20;
         this.isLoading = false;
         this.hasMoreItems = true;
-        this.currentSort = 'newest';
         this.activeFilters = {
             color: [],
             size: [],
@@ -24,12 +23,6 @@ class InventarApp {
     }
 
     setupEventListeners() {
-        // Sort functionality
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('sort-option')) {
-                this.toggleSortOption(e.target);
-            }
-        });
 
         // Filter functionality
         document.getElementById('filterBtn').addEventListener('click', () => {
@@ -118,8 +111,7 @@ class InventarApp {
             this.hasMoreItems = this.items.length > 0;
             
             this.updateItemCount();
-            this.sortItems();
-            this.updateSortButtons();
+            this.filterItems();
             this.showLoading(false);
             
             if (this.items.length === 0) {
@@ -139,62 +131,6 @@ class InventarApp {
         this.hasMoreItems = true;
         document.getElementById('gridContainer').innerHTML = '';
         await this.loadItems();
-    }
-
-    sortItems() {
-        const gridContainer = document.getElementById('gridContainer');
-        
-        // Add sorting animation
-        gridContainer.style.opacity = '0.5';
-        gridContainer.style.transform = 'scale(0.98)';
-        
-        setTimeout(() => {
-            this.filteredItems = [...this.items];
-            
-            switch (this.currentSort) {
-                case 'newest':
-                    this.filteredItems.sort((a, b) => new Date(b.id) - new Date(a.id));
-                    break;
-                case 'oldest':
-                    this.filteredItems.sort((a, b) => new Date(a.id) - new Date(b.id));
-                    break;
-                case 'color':
-                    this.filteredItems.sort((a, b) => {
-                        const aColor = this.getTagValue(a, 'color') || 'zzz';
-                        const bColor = this.getTagValue(b, 'color') || 'zzz';
-                        return aColor.localeCompare(bColor);
-                    });
-                    break;
-                case 'size':
-                    this.filteredItems.sort((a, b) => {
-                        const sizeOrder = { 'tiny': 0, 'small': 1, 'medium': 2, 'large': 3, 'huge': 4 };
-                        const aSize = sizeOrder[this.getTagValue(a, 'size')] || 5;
-                        const bSize = sizeOrder[this.getTagValue(b, 'size')] || 5;
-                        return aSize - bSize;
-                    });
-                    break;
-                case 'room':
-                    this.filteredItems.sort((a, b) => {
-                        const aRoom = this.getTagValue(a, 'room') || 'zzz';
-                        const bRoom = this.getTagValue(b, 'room') || 'zzz';
-                        return aRoom.localeCompare(bRoom);
-                    });
-                    break;
-                case 'price':
-                    this.filteredItems.sort((a, b) => {
-                        const aPrice = parseFloat(this.getTagValue(a, 'price')) || 0;
-                        const bPrice = parseFloat(this.getTagValue(b, 'price')) || 0;
-                        return bPrice - aPrice; // Highest price first
-                    });
-                    break;
-            }
-            
-            this.renderItems();
-            
-            // Complete animation
-            gridContainer.style.opacity = '1';
-            gridContainer.style.transform = 'scale(1)';
-        }, 200);
     }
 
     getTagValue(item, tagType) {
@@ -373,7 +309,7 @@ class InventarApp {
             this.currentPage = 0;
             this.hasMoreItems = this.filteredItems.length > 0;
             
-            this.sortItems();
+            this.renderItems();
             this.updateActiveFiltersDisplay();
             
             // Complete animation
@@ -473,39 +409,6 @@ class InventarApp {
         this.filterItems();
     }
 
-    toggleSortOption(option) {
-        const sortType = option.dataset.sort;
-        
-        // If clicking the same sort option, toggle it off (reset to newest)
-        if (this.currentSort === sortType) {
-            this.currentSort = 'newest';
-            option.classList.remove('active');
-        } else {
-            // Remove active class from all sort options
-            document.querySelectorAll('.sort-option').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            // Set new sort and activate button
-            this.currentSort = sortType;
-            option.classList.add('active');
-        }
-        
-        this.sortItems();
-    }
-
-    updateSortButtons() {
-        // Remove active class from all sort options
-        document.querySelectorAll('.sort-option').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        
-        // Activate the current sort option
-        const activeButton = document.querySelector(`[data-sort="${this.currentSort}"]`);
-        if (activeButton) {
-            activeButton.classList.add('active');
-        }
-    }
 
     setupInfiniteScroll() {
         const observer = new IntersectionObserver((entries) => {
