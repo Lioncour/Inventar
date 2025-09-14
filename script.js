@@ -25,9 +25,10 @@ class InventarApp {
 
     setupEventListeners() {
         // Sort functionality
-        document.getElementById('sortSelect').addEventListener('change', (e) => {
-            this.currentSort = e.target.value;
-            this.sortItems();
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('sort-option')) {
+                this.toggleSortOption(e.target);
+            }
         });
 
         // Filter functionality
@@ -118,6 +119,7 @@ class InventarApp {
             
             this.updateItemCount();
             this.sortItems();
+            this.updateSortButtons();
             this.showLoading(false);
             
             if (this.items.length === 0) {
@@ -469,6 +471,40 @@ class InventarApp {
     removeFilter(type, value) {
         this.activeFilters[type] = this.activeFilters[type].filter(v => v !== value);
         this.filterItems();
+    }
+
+    toggleSortOption(option) {
+        const sortType = option.dataset.sort;
+        
+        // If clicking the same sort option, toggle it off (reset to newest)
+        if (this.currentSort === sortType) {
+            this.currentSort = 'newest';
+            option.classList.remove('active');
+        } else {
+            // Remove active class from all sort options
+            document.querySelectorAll('.sort-option').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Set new sort and activate button
+            this.currentSort = sortType;
+            option.classList.add('active');
+        }
+        
+        this.sortItems();
+    }
+
+    updateSortButtons() {
+        // Remove active class from all sort options
+        document.querySelectorAll('.sort-option').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Activate the current sort option
+        const activeButton = document.querySelector(`[data-sort="${this.currentSort}"]`);
+        if (activeButton) {
+            activeButton.classList.add('active');
+        }
     }
 
     setupInfiniteScroll() {
