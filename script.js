@@ -121,12 +121,12 @@ class InventarApp {
         const allTags = [...(item.tags.auto || []), ...(item.tags.manual || [])];
         
         modalContent.innerHTML = `
-            <div class="p-6">
+            <div class="p-2">
                 <div class="mb-6">
                     <img 
                         src="${item.imageUrl}" 
-                        alt="Item ${item.id}"
-                        class="w-full max-h-96 object-contain rounded-lg shadow-lg"
+                        alt="Item"
+                        class="w-full h-auto max-h-[80vh] object-contain rounded-lg shadow-lg"
                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzk5YTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIG5vdCBmb3VuZDwvdGV4dD48L3N2Zz4='"
                     >
                 </div>
@@ -144,11 +144,6 @@ class InventarApp {
                         </div>
                     </div>
                 ` : ''}
-                
-                <div class="text-sm text-gray-500">
-                    <p><strong>ID:</strong> ${item.id}</p>
-                    <p><strong>Added:</strong> ${new Date(item.id).toLocaleDateString()}</p>
-                </div>
             </div>
         `;
         
