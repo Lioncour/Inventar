@@ -3,171 +3,344 @@
     "id": "2024-01-15T10:30:00.000Z",
     "imageUrl": "images/sample-item-1.png",
     "tags": {
-      "auto": [
-        "color:blue",
-        "size:medium"
-      ],
-      "manual": [
-        "vintage",
-        "electronics"
-      ]
+      "auto": ["color:blue", "size:medium"],
+      "manual": ["vintage", "electronics"]
     }
   },
   {
     "id": "2024-01-15T11:45:00.000Z",
     "imageUrl": "images/sample-item-2.png",
     "tags": {
-      "auto": [
-        "color:red",
-        "size:small"
-      ],
-      "manual": [
-        "gift",
-        "handmade"
-      ]
+      "auto": ["color:red", "size:small"],
+      "manual": ["gift", "handmade"]
     }
   },
   {
     "id": "2024-01-15T14:20:00.000Z",
     "imageUrl": "images/sample-item-3.png",
     "tags": {
-      "auto": [
-        "color:green",
-        "size:large"
-      ],
+      "auto": ["color:green", "size:large"],
       "manual": []
     }
   },
   {
-    "id": "2025-09-13T22:58:15.457Z",
-    "imageUrl": "images/DSCF0001.JPG",
+    "id": "2024-01-16T09:15:00.000Z",
+    "imageUrl": "images/dummy-item-01.svg",
     "tags": {
-      "auto": [
-        "color:unknown",
-        "size:medium"
-      ],
-      "manual": []
+      "auto": [],
+      "manual": ["color:red", "size:medium", "price:45", "room:bedroom"]
     }
   },
   {
-    "id": "2025-09-13T22:58:21.157Z",
-    "imageUrl": "images/DSCF0056.JPG",
+    "id": "2024-01-16T09:16:00.000Z",
+    "imageUrl": "images/dummy-item-02.svg",
     "tags": {
-      "auto": [
-        "color:unknown",
-        "size:medium"
-      ],
-      "manual": []
+      "auto": [],
+      "manual": ["color:blue", "size:small", "price:25", "room:living room"]
     }
   },
   {
-    "id": "2025-09-13T22:58:25.629Z",
-    "imageUrl": "images/DSCF0054.JPG",
+    "id": "2024-01-16T09:17:00.000Z",
+    "imageUrl": "images/dummy-item-03.svg",
     "tags": {
-      "auto": [
-        "color:unknown",
-        "size:medium"
-      ],
-      "manual": []
+      "auto": [],
+      "manual": ["color:green", "size:large", "price:120", "room:kitchen"]
     }
   },
   {
-    "id": "2025-09-13T22:58:27.946Z",
-    "imageUrl": "images/insp logans heroes.png",
+    "id": "2024-01-16T09:18:00.000Z",
+    "imageUrl": "images/dummy-item-04.svg",
     "tags": {
-      "auto": [
-        "color:unknown",
-        "size:medium"
-      ],
-      "manual": []
+      "auto": [],
+      "manual": ["color:yellow", "size:medium", "price:80", "room:bathroom"]
     }
   },
   {
-    "id": "2025-09-13T22:58:30.143Z",
-    "imageUrl": "images/e22b17b4445542629903462ffe8ad00f.jpg",
+    "id": "2024-01-16T09:19:00.000Z",
+    "imageUrl": "images/dummy-item-05.svg",
     "tags": {
-      "auto": [
-        "color:unknown",
-        "size:medium"
-      ],
-      "manual": []
+      "auto": [],
+      "manual": ["color:purple", "size:small", "price:35", "room:office"]
     }
   },
   {
-    "id": "2025-09-13T22:58:31.728Z",
-    "imageUrl": "images/714ec9af5f244783be875f51edc06298.jpg",
+    "id": "2024-01-16T09:20:00.000Z",
+    "imageUrl": "images/dummy-item-06.svg",
     "tags": {
-      "auto": [
-        "color:unknown",
-        "size:medium"
-      ],
-      "manual": []
+      "auto": [],
+      "manual": ["color:orange", "size:large", "price:200", "room:garage"]
     }
   },
   {
-    "id": "2025-09-13T22:58:33.962Z",
-    "imageUrl": "images/5b93706676aa42708382fb5036278f70.jpg",
+    "id": "2024-01-16T09:21:00.000Z",
+    "imageUrl": "images/dummy-item-07.svg",
     "tags": {
-      "auto": [
-        "color:unknown",
-        "size:medium"
-      ],
-      "manual": []
+      "auto": [],
+      "manual": ["color:pink", "size:medium", "price:65", "room:bedroom"]
     }
   },
   {
-    "id": "2025-09-13T22:58:35.485Z",
-    "imageUrl": "images/820c280695e56bf7c64dbb907fad3f41.jpg",
+    "id": "2024-01-16T09:22:00.000Z",
+    "imageUrl": "images/dummy-item-08.svg",
     "tags": {
-      "auto": [
-        "color:unknown",
-        "size:medium"
-      ],
-      "manual": []
+      "auto": [],
+      "manual": ["color:brown", "size:small", "price:15", "room:living room"]
     }
   },
   {
-    "id": "2025-09-14T07:18:41.784Z",
-    "imageUrl": "images/Screenshot_20250912_083621_processed.png",
+    "id": "2024-01-16T09:23:00.000Z",
+    "imageUrl": "images/dummy-item-09.svg",
     "tags": {
-      "auto": [
-        "color:unknown",
-        "size:medium"
-      ],
-      "manual": []
+      "auto": [],
+      "manual": ["color:gray", "size:large", "price:150", "room:kitchen"]
     }
   },
   {
-    "id": "2025-09-14T07:18:45.796Z",
-    "imageUrl": "images/20250720_141256_processed.png",
+    "id": "2024-01-16T09:24:00.000Z",
+    "imageUrl": "images/dummy-item-10.svg",
     "tags": {
-      "auto": [
-        "color:unknown",
-        "size:medium"
-      ],
-      "manual": []
+      "auto": [],
+      "manual": ["color:black", "size:medium", "price:90", "room:bathroom"]
     }
   },
   {
-    "id": "2025-09-14T07:26:11.379Z",
-    "imageUrl": "images/Screenshot_20250912_083621_processed.png",
+    "id": "2024-01-16T09:25:00.000Z",
+    "imageUrl": "images/dummy-item-11.svg",
     "tags": {
-      "auto": [
-        "color:unknown",
-        "size:medium"
-      ],
-      "manual": []
+      "auto": [],
+      "manual": ["color:red", "size:small", "price:30", "room:office"]
     }
   },
   {
-    "id": "2025-09-14T07:26:14.366Z",
-    "imageUrl": "images/20250720_141256_processed.png",
+    "id": "2024-01-16T09:26:00.000Z",
+    "imageUrl": "images/dummy-item-12.svg",
     "tags": {
-      "auto": [
-        "color:unknown",
-        "size:medium"
-      ],
-      "manual": []
+      "auto": [],
+      "manual": ["color:blue", "size:large", "price:180", "room:garage"]
+    }
+  },
+  {
+    "id": "2024-01-16T09:27:00.000Z",
+    "imageUrl": "images/dummy-item-13.svg",
+    "tags": {
+      "auto": [],
+      "manual": ["color:green", "size:medium", "price:55", "room:bedroom"]
+    }
+  },
+  {
+    "id": "2024-01-16T09:28:00.000Z",
+    "imageUrl": "images/dummy-item-14.svg",
+    "tags": {
+      "auto": [],
+      "manual": ["color:yellow", "size:small", "price:20", "room:living room"]
+    }
+  },
+  {
+    "id": "2024-01-16T09:29:00.000Z",
+    "imageUrl": "images/dummy-item-15.svg",
+    "tags": {
+      "auto": [],
+      "manual": ["color:purple", "size:large", "price:220", "room:kitchen"]
+    }
+  },
+  {
+    "id": "2024-01-16T09:30:00.000Z",
+    "imageUrl": "images/dummy-item-16.svg",
+    "tags": {
+      "auto": [],
+      "manual": ["color:orange", "size:medium", "price:75", "room:bathroom"]
+    }
+  },
+  {
+    "id": "2024-01-16T09:31:00.000Z",
+    "imageUrl": "images/dummy-item-17.svg",
+    "tags": {
+      "auto": [],
+      "manual": ["color:pink", "size:small", "price:40", "room:office"]
+    }
+  },
+  {
+    "id": "2024-01-16T09:32:00.000Z",
+    "imageUrl": "images/dummy-item-18.svg",
+    "tags": {
+      "auto": [],
+      "manual": ["color:brown", "size:large", "price:160", "room:garage"]
+    }
+  },
+  {
+    "id": "2024-01-16T09:33:00.000Z",
+    "imageUrl": "images/dummy-item-19.svg",
+    "tags": {
+      "auto": [],
+      "manual": ["color:gray", "size:medium", "price:85", "room:bedroom"]
+    }
+  },
+  {
+    "id": "2024-01-16T09:34:00.000Z",
+    "imageUrl": "images/dummy-item-20.svg",
+    "tags": {
+      "auto": [],
+      "manual": ["color:black", "size:small", "price:25", "room:living room"]
+    }
+  },
+  {
+    "id": "2024-01-16T09:35:00.000Z",
+    "imageUrl": "images/dummy-item-21.svg",
+    "tags": {
+      "auto": [],
+      "manual": ["color:red", "size:large", "price:300", "room:kitchen"]
+    }
+  },
+  {
+    "id": "2024-01-16T09:36:00.000Z",
+    "imageUrl": "images/dummy-item-22.svg",
+    "tags": {
+      "auto": [],
+      "manual": ["color:blue", "size:medium", "price:70", "room:bathroom"]
+    }
+  },
+  {
+    "id": "2024-01-16T09:37:00.000Z",
+    "imageUrl": "images/dummy-item-23.svg",
+    "tags": {
+      "auto": [],
+      "manual": ["color:green", "size:small", "price:35", "room:office"]
+    }
+  },
+  {
+    "id": "2024-01-16T09:38:00.000Z",
+    "imageUrl": "images/dummy-item-24.svg",
+    "tags": {
+      "auto": [],
+      "manual": ["color:yellow", "size:large", "price:250", "room:garage"]
+    }
+  },
+  {
+    "id": "2024-01-16T09:39:00.000Z",
+    "imageUrl": "images/dummy-item-25.svg",
+    "tags": {
+      "auto": [],
+      "manual": ["color:purple", "size:medium", "price:95", "room:bedroom"]
+    }
+  },
+  {
+    "id": "2024-01-16T09:40:00.000Z",
+    "imageUrl": "images/dummy-item-26.svg",
+    "tags": {
+      "auto": [],
+      "manual": ["color:orange", "size:small", "price:50", "room:living room"]
+    }
+  },
+  {
+    "id": "2024-01-16T09:41:00.000Z",
+    "imageUrl": "images/dummy-item-27.svg",
+    "tags": {
+      "auto": [],
+      "manual": ["color:pink", "size:large", "price:180", "room:kitchen"]
+    }
+  },
+  {
+    "id": "2024-01-16T09:42:00.000Z",
+    "imageUrl": "images/dummy-item-28.svg",
+    "tags": {
+      "auto": [],
+      "manual": ["color:brown", "size:medium", "price:110", "room:bathroom"]
+    }
+  },
+  {
+    "id": "2024-01-16T09:43:00.000Z",
+    "imageUrl": "images/dummy-item-29.svg",
+    "tags": {
+      "auto": [],
+      "manual": ["color:gray", "size:small", "price:45", "room:office"]
+    }
+  },
+  {
+    "id": "2024-01-16T09:44:00.000Z",
+    "imageUrl": "images/dummy-item-30.svg",
+    "tags": {
+      "auto": [],
+      "manual": ["color:black", "size:large", "price:280", "room:garage"]
+    }
+  },
+  {
+    "id": "2024-01-16T09:45:00.000Z",
+    "imageUrl": "images/dummy-item-31.svg",
+    "tags": {
+      "auto": [],
+      "manual": ["color:red", "size:medium", "price:65", "room:bedroom"]
+    }
+  },
+  {
+    "id": "2024-01-16T09:46:00.000Z",
+    "imageUrl": "images/dummy-item-32.svg",
+    "tags": {
+      "auto": [],
+      "manual": ["color:blue", "size:small", "price:30", "room:living room"]
+    }
+  },
+  {
+    "id": "2024-01-16T09:47:00.000Z",
+    "imageUrl": "images/dummy-item-33.svg",
+    "tags": {
+      "auto": [],
+      "manual": ["color:green", "size:large", "price:200", "room:kitchen"]
+    }
+  },
+  {
+    "id": "2024-01-16T09:48:00.000Z",
+    "imageUrl": "images/dummy-item-34.svg",
+    "tags": {
+      "auto": [],
+      "manual": ["color:yellow", "size:medium", "price:80", "room:bathroom"]
+    }
+  },
+  {
+    "id": "2024-01-16T09:49:00.000Z",
+    "imageUrl": "images/dummy-item-35.svg",
+    "tags": {
+      "auto": [],
+      "manual": ["color:purple", "size:small", "price:40", "room:office"]
+    }
+  },
+  {
+    "id": "2024-01-16T09:50:00.000Z",
+    "imageUrl": "images/dummy-item-36.svg",
+    "tags": {
+      "auto": [],
+      "manual": ["color:orange", "size:large", "price:320", "room:garage"]
+    }
+  },
+  {
+    "id": "2024-01-16T09:51:00.000Z",
+    "imageUrl": "images/dummy-item-37.svg",
+    "tags": {
+      "auto": [],
+      "manual": ["color:pink", "size:medium", "price:75", "room:bedroom"]
+    }
+  },
+  {
+    "id": "2024-01-16T09:52:00.000Z",
+    "imageUrl": "images/dummy-item-38.svg",
+    "tags": {
+      "auto": [],
+      "manual": ["color:brown", "size:small", "price:20", "room:living room"]
+    }
+  },
+  {
+    "id": "2024-01-16T09:53:00.000Z",
+    "imageUrl": "images/dummy-item-39.svg",
+    "tags": {
+      "auto": [],
+      "manual": ["color:gray", "size:large", "price:240", "room:kitchen"]
+    }
+  },
+  {
+    "id": "2024-01-16T09:54:00.000Z",
+    "imageUrl": "images/dummy-item-40.svg",
+    "tags": {
+      "auto": [],
+      "manual": ["color:black", "size:medium", "price:100", "room:bathroom"]
     }
   }
 ]

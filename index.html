@@ -8,10 +8,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .grid-item {
-            transition: transform 0.2s ease-in-out;
+            transition: transform 0.2s ease-in-out, opacity 0.3s ease-in-out;
         }
         .grid-item:hover {
             transform: scale(1.02);
+        }
+        #gridContainer {
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
         }
         .modal {
             display: none;
@@ -81,17 +84,27 @@
 </head>
 <body class="bg-gray-50 min-h-screen">
     <!-- Header -->
-    <header class="bg-white shadow-sm border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-6">
-                <div class="flex items-center">
+    <header class="bg-white shadow-sm border-b border-gray-200 fixed top-0 left-0 right-0 z-40">
+        <div class="px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div>
                     <h1 class="text-3xl font-bold text-gray-900">Inventar</h1>
-                    <span class="ml-3 text-sm text-gray-500">Personal Item Inventory</span>
-                </div>
-                <div class="flex items-center space-x-4">
                     <span id="itemCount" class="text-sm text-gray-500">Loading...</span>
-                    <button id="refreshBtn" class="p-2 text-gray-400 hover:text-gray-600 transition-colors">
-                        <i class="fas fa-sync-alt"></i>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <div class="flex items-center space-x-4">
+                        <label for="sortSelect" class="text-sm font-medium text-gray-700">Sort by:</label>
+                        <select id="sortSelect" class="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="newest">Newest First</option>
+                            <option value="oldest">Oldest First</option>
+                            <option value="color">Color</option>
+                            <option value="size">Size</option>
+                            <option value="room">Room</option>
+                            <option value="price">Price</option>
+                        </select>
+                    </div>
+                    <button id="aboutBtn" class="text-gray-600 hover:text-gray-900 transition-colors font-medium">
+                        About
                     </button>
                 </div>
             </div>
@@ -99,7 +112,7 @@
     </header>
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main class="pt-20 px-4 sm:px-6 lg:px-8 pb-8">
         <!-- Loading State -->
         <div id="loadingState" class="flex justify-center items-center py-12">
             <div class="loading"></div>
@@ -107,7 +120,7 @@
         </div>
 
         <!-- Grid Container -->
-        <div id="gridContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4" style="display: none;">
+        <div id="gridContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-2 sm:gap-3 md:gap-4" style="display: none;">
             <!-- Items will be dynamically loaded here -->
         </div>
 
@@ -121,12 +134,59 @@
         </div>
     </main>
 
-    <!-- Modal -->
+    <!-- Item Modal -->
     <div id="itemModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
             <div id="modalContent">
                 <!-- Modal content will be dynamically loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- About Modal -->
+    <div id="aboutModal" class="modal">
+        <div class="modal-content max-w-2xl">
+            <span class="close" id="aboutClose">&times;</span>
+            <div class="p-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-6">About Inventar</h2>
+                
+                <div class="space-y-6 text-gray-700">
+                    <p class="text-lg">
+                        <strong>Inventar</strong> is a personal item inventory system that automatically processes and organizes your belongings using AI and automation.
+                    </p>
+                    
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">Features</h3>
+                        <ul class="space-y-2 list-disc list-inside">
+                            <li><strong>Automated Processing:</strong> Images are automatically downloaded from Google Drive and processed</li>
+                            <li><strong>Background Removal:</strong> Clean, professional-looking item photos with white backgrounds</li>
+                            <li><strong>AI Tagging:</strong> Automatic color and size detection</li>
+                            <li><strong>Custom Tags:</strong> Add your own tags for size, color, price, and room location</li>
+                            <li><strong>Smart Sorting:</strong> Sort items by various criteria with smooth animations</li>
+                            <li><strong>Responsive Design:</strong> Works perfectly on all devices</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">How It Works</h3>
+                        <ol class="space-y-2 list-decimal list-inside">
+                            <li>Upload images to your designated Google Drive folder</li>
+                            <li>GitHub Actions automatically processes new images every hour</li>
+                            <li>Backgrounds are removed and AI tags are generated</li>
+                            <li>Items appear in your inventory with automatic updates</li>
+                            <li>Use the admin panel to add custom tags and organize your items</li>
+                        </ol>
+                    </div>
+                    
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold text-blue-900 mb-2">Admin Panel</h3>
+                        <p class="text-blue-800">
+                            Access the admin panel at <code class="bg-blue-100 px-2 py-1 rounded">/admin.html</code> 
+                            to add custom tags and manage your inventory.
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

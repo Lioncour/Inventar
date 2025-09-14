@@ -1,10 +1,12 @@
 class InventarApp {
     constructor() {
         this.items = [];
+        this.filteredItems = [];
         this.currentPage = 0;
         this.itemsPerPage = 20;
         this.isLoading = false;
         this.hasMoreItems = true;
+        this.currentSort = 'newest';
         
         this.init();
     }
@@ -16,29 +18,46 @@ class InventarApp {
     }
 
     setupEventListeners() {
-        // Refresh button
-        document.getElementById('refreshBtn').addEventListener('click', () => {
-            this.refreshItems();
+        // Sort functionality
+        document.getElementById('sortSelect').addEventListener('change', (e) => {
+            this.currentSort = e.target.value;
+            this.sortItems();
+        });
+
+        // About modal
+        document.getElementById('aboutBtn').addEventListener('click', () => {
+            this.openAboutModal();
         });
 
         // Modal close events
-        const modal = document.getElementById('itemModal');
-        const closeBtn = document.querySelector('.close');
+        const itemModal = document.getElementById('itemModal');
+        const aboutModal = document.getElementById('aboutModal');
+        const closeBtns = document.querySelectorAll('.close');
         
-        closeBtn.addEventListener('click', () => {
-            this.closeModal();
+        closeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.closeModal();
+                this.closeAboutModal();
+            });
         });
 
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
+        itemModal.addEventListener('click', (e) => {
+            if (e.target === itemModal) {
                 this.closeModal();
             }
         });
 
-        // Escape key to close modal
+        aboutModal.addEventListener('click', (e) => {
+            if (e.target === aboutModal) {
+                this.closeAboutModal();
+            }
+        });
+
+        // Escape key to close modals
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 this.closeModal();
+                this.closeAboutModal();
             }
         });
     }
@@ -53,11 +72,12 @@ class InventarApp {
             }
             
             this.items = await response.json();
+            this.filteredItems = [...this.items];
             this.currentPage = 0;
             this.hasMoreItems = this.items.length > 0;
             
             this.updateItemCount();
-            this.renderItems();
+            this.sortItems();
             this.showLoading(false);
             
             if (this.items.length === 0) {
@@ -72,24 +92,89 @@ class InventarApp {
 
     async refreshItems() {
         this.items = [];
+        this.filteredItems = [];
         this.currentPage = 0;
         this.hasMoreItems = true;
         document.getElementById('gridContainer').innerHTML = '';
         await this.loadItems();
     }
 
+    sortItems() {
+        const gridContainer = document.getElementById('gridContainer');
+        
+        // Add sorting animation
+        gridContainer.style.opacity = '0.5';
+        gridContainer.style.transform = 'scale(0.98)';
+        
+        setTimeout(() => {
+            this.filteredItems = [...this.items];
+            
+            switch (this.currentSort) {
+                case 'newest':
+                    this.filteredItems.sort((a, b) => new Date(b.id) - new Date(a.id));
+                    break;
+                case 'oldest':
+                    this.filteredItems.sort((a, b) => new Date(a.id) - new Date(b.id));
+                    break;
+                case 'color':
+                    this.filteredItems.sort((a, b) => {
+                        const aColor = this.getTagValue(a, 'color') || 'zzz';
+                        const bColor = this.getTagValue(b, 'color') || 'zzz';
+                        return aColor.localeCompare(bColor);
+                    });
+                    break;
+                case 'size':
+                    this.filteredItems.sort((a, b) => {
+                        const sizeOrder = { 'tiny': 0, 'small': 1, 'medium': 2, 'large': 3, 'huge': 4 };
+                        const aSize = sizeOrder[this.getTagValue(a, 'size')] || 5;
+                        const bSize = sizeOrder[this.getTagValue(b, 'size')] || 5;
+                        return aSize - bSize;
+                    });
+                    break;
+                case 'room':
+                    this.filteredItems.sort((a, b) => {
+                        const aRoom = this.getTagValue(a, 'room') || 'zzz';
+                        const bRoom = this.getTagValue(b, 'room') || 'zzz';
+                        return aRoom.localeCompare(bRoom);
+                    });
+                    break;
+                case 'price':
+                    this.filteredItems.sort((a, b) => {
+                        const aPrice = parseFloat(this.getTagValue(a, 'price')) || 0;
+                        const bPrice = parseFloat(this.getTagValue(b, 'price')) || 0;
+                        return bPrice - aPrice; // Highest price first
+                    });
+                    break;
+            }
+            
+            this.renderItems();
+            
+            // Complete animation
+            gridContainer.style.opacity = '1';
+            gridContainer.style.transform = 'scale(1)';
+        }, 200);
+    }
+
+    getTagValue(item, tagType) {
+        const allTags = [...(item.tags.auto || []), ...(item.tags.manual || [])];
+        const tag = allTags.find(t => t.toLowerCase().startsWith(tagType.toLowerCase() + ':'));
+        return tag ? tag.split(':')[1] : null;
+    }
+
     renderItems() {
         const gridContainer = document.getElementById('gridContainer');
+        gridContainer.innerHTML = ''; // Clear existing items
+        
         const startIndex = this.currentPage * this.itemsPerPage;
-        const endIndex = Math.min(startIndex + this.itemsPerPage, this.items.length);
+        const endIndex = Math.min(startIndex + this.itemsPerPage, this.filteredItems.length);
         
         for (let i = startIndex; i < endIndex; i++) {
-            const item = this.items[i];
+            const item = this.filteredItems[i];
             this.createGridItem(item, gridContainer);
         }
         
         this.currentPage++;
-        this.hasMoreItems = endIndex < this.items.length;
+        this.hasMoreItems = endIndex < this.filteredItems.length;
     }
 
     createGridItem(item, container) {
@@ -157,6 +242,18 @@ class InventarApp {
         document.body.style.overflow = 'auto';
     }
 
+    openAboutModal() {
+        const modal = document.getElementById('aboutModal');
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+
+    closeAboutModal() {
+        const modal = document.getElementById('aboutModal');
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
     setupInfiniteScroll() {
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -184,7 +281,17 @@ class InventarApp {
         // Simulate a small delay for better UX
         await new Promise(resolve => setTimeout(resolve, 300));
         
-        this.renderItems();
+        const gridContainer = document.getElementById('gridContainer');
+        const startIndex = this.currentPage * this.itemsPerPage;
+        const endIndex = Math.min(startIndex + this.itemsPerPage, this.filteredItems.length);
+        
+        for (let i = startIndex; i < endIndex; i++) {
+            const item = this.filteredItems[i];
+            this.createGridItem(item, gridContainer);
+        }
+        
+        this.currentPage++;
+        this.hasMoreItems = endIndex < this.filteredItems.length;
         this.isLoading = false;
     }
 
