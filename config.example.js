@@ -4,8 +4,14 @@
 const config = {
     // Google Drive Configuration
     googleDrive: {
-        folderId: '15qXM2hCZvobiMsP0zHzZdOU1S6BzJRqe', // Your specific folder ID
-        serviceAccountKey: 'YOUR_SERVICE_ACCOUNT_JSON_KEY' // JSON as string
+        inventar: {
+            folderId: '15qXM2hCZvobiMsP0zHzZdOU1S6BzJRqe', // Your Inventar folder ID
+            serviceAccountKey: 'YOUR_SERVICE_ACCOUNT_JSON_KEY' // JSON as string
+        },
+        '33plus7': {
+            folderId: 'YOUR_33PLUS7_FOLDER_ID', // Your 33+7 folder ID
+            serviceAccountKey: 'YOUR_SERVICE_ACCOUNT_JSON_KEY' // Same service account
+        }
     },
     
     // API Keys

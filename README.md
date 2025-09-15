@@ -12,6 +12,7 @@ A beautiful, modern, and clean single-page web application for managing your per
 - ♾️ **Infinite Scroll**: Smooth scrolling experience with lazy loading
 - 🔍 **Modal Lightbox**: Click any item to view it in detail with all tags
 - 🔐 **Admin Panel**: Password-protected interface for manual tag management
+- 👕 **33+7 Capsule Wardrobe**: Dedicated clothing inventory with horizontal scrolling categories
 
 ## Technology Stack
 
@@ -33,8 +34,11 @@ A beautiful, modern, and clean single-page web application for managing your per
 1. Create a Google Cloud Project
 2. Enable the Google Drive API
 3. Create a Service Account and download the JSON key
-4. Share your Google Drive folder (`15qXM2hCZvobiMsP0zHzZdOU1S6BzJRqe`) with your service account email
-5. The folder ID is already configured: `15qXM2hCZvobiMsP0zHzZdOU1S6BzJRqe`
+4. Create two folders in Google Drive:
+   - **Inventar folder**: For general items (ID: `15qXM2hCZvobiMsP0zHzZdOU1S6BzJRqe`)
+   - **33+7 folder**: For clothing items (create new folder and get its ID)
+5. Share both folders with your service account email
+6. Update the 33+7 folder ID in `process-images.js` (line 22)
 
 ### 3. API Keys Setup
 

@@ -374,14 +374,31 @@
                 try {
                     this.showLoading(true);
                     
-                    // For now, we'll use dummy data
-                    // In production, this would fetch from items.json or Google Drive
-                    this.allItems = this.generateDummyClothing();
+                    // Load real data from items.json
+                    const response = await fetch('items.json');
+                    if (!response.ok) {
+                        throw new Error('Failed to load items.json');
+                    }
+                    
+                    const allItems = await response.json();
+                    
+                    // Filter for clothing items only
+                    this.allItems = allItems.filter(item => 
+                        item.folderType === 'clothing' || 
+                        (item.category && ['outerwear', 'accessories', 'bottoms', 'tops', 'shoes'].includes(item.category))
+                    );
+                    
+                    // If no real data, fall back to dummy data
+                    if (this.allItems.length === 0) {
+                        console.log('No clothing items found, using dummy data for testing');
+                        this.allItems = this.generateDummyClothing();
+                    }
                     
                     this.showLoading(false);
                 } catch (error) {
                     console.error('Error loading items:', error);
-                    this.showError('Failed to load wardrobe. Please try again.');
+                    console.log('Falling back to dummy data');
+                    this.allItems = this.generateDummyClothing();
                     this.showLoading(false);
                 }
             }
@@ -429,8 +446,13 @@
                 };
 
                 this.allItems.forEach(item => {
-                    if (this.categories[item.category]) {
-                        this.categories[item.category].push(item);
+                    // Use the category from the item, or fallback to 'tops' for unknown categories
+                    const category = item.category || 'tops';
+                    if (this.categories[category]) {
+                        this.categories[category].push(item);
+                    } else {
+                        // Fallback to tops for unknown categories
+                        this.categories['tops'].push(item);
                     }
                 });
             }
@@ -492,10 +514,15 @@
             createClothingItem(item) {
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'clothing-item';
+                
+                // Use real image URL or fallback to placeholder
+                const imageUrl = item.imageUrl || 'https://via.placeholder.com/200x200/333333/ffffff?text=IMAGE+NOT+FOUND';
+                const itemName = item.name || item.id || 'Unknown Item';
+                
                 itemDiv.innerHTML = `
                     <img 
-                        src="${item.imageUrl}" 
-                        alt="${item.name}"
+                        src="${imageUrl}" 
+                        alt="${itemName}"
                         onerror="this.src='https://via.placeholder.com/200x200/333333/ffffff?text=IMAGE+NOT+FOUND'"
                     >
                 `;
@@ -508,8 +535,22 @@
             }
 
             showItemDetails(item) {
-                // Simple alert for now - could be expanded to a modal
-                alert(`${item.name}\nCategory: ${item.category}\nColor: ${item.color}`);
+                // Extract tags for display
+                const autoTags = item.tags?.auto || [];
+                const manualTags = item.tags?.manual || [];
+                const allTags = [...autoTags, ...manualTags];
+                
+                const itemName = item.name || item.id || 'Unknown Item';
+                const category = item.category || 'Unknown';
+                
+                // Create a simple modal-like display
+                const details = `
+${itemName}
+Category: ${category}
+Tags: ${allTags.join(', ') || 'None'}
+                `.trim();
+                
+                alert(details);
             }
 
             showLoading(show) {
