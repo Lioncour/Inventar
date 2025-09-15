@@ -3,24 +3,519 @@
     "id": "2024-01-15T10:30:00.000Z",
     "imageUrl": "images/sample-item-1.png",
     "tags": {
-      "auto": ["color:blue", "size:medium"],
-      "manual": ["vintage", "electronics"]
+      "auto": [
+        "color:blue",
+        "size:medium"
+      ],
+      "manual": [
+        "vintage",
+        "electronics"
+      ]
     }
   },
   {
     "id": "2024-01-15T11:45:00.000Z",
     "imageUrl": "images/sample-item-2.png",
     "tags": {
-      "auto": ["color:red", "size:small"],
-      "manual": ["gift", "handmade"]
+      "auto": [
+        "color:red",
+        "size:small"
+      ],
+      "manual": [
+        "gift",
+        "handmade"
+      ]
     }
   },
   {
     "id": "2024-01-15T14:20:00.000Z",
     "imageUrl": "images/sample-item-3.png",
     "tags": {
-      "auto": ["color:green", "size:large"],
+      "auto": [
+        "color:green",
+        "size:large"
+      ],
       "manual": []
     }
+  },
+  {
+    "id": 4,
+    "name": "Black Leather Jacket",
+    "imageUrl": "https://via.placeholder.com/400x400/black/FFFFFF?text=Black%20Leather%20Jacket",
+    "folderType": "clothing",
+    "category": "outerwear",
+    "tags": {
+      "auto": [
+        "color:black",
+        "price:150",
+        "category:outerwear"
+      ],
+      "manual": []
+    },
+    "addedDate": "2025-09-15T22:15:30.539Z"
+  },
+  {
+    "id": 5,
+    "name": "Navy Blazer",
+    "imageUrl": "https://via.placeholder.com/400x400/1E3A8A/FFFFFF?text=Navy%20Blazer",
+    "folderType": "clothing",
+    "category": "outerwear",
+    "tags": {
+      "auto": [
+        "color:navy",
+        "price:120",
+        "category:outerwear"
+      ],
+      "manual": []
+    },
+    "addedDate": "2025-09-15T22:15:30.539Z"
+  },
+  {
+    "id": 6,
+    "name": "Gray Cardigan",
+    "imageUrl": "https://via.placeholder.com/400x400/gray/FFFFFF?text=Gray%20Cardigan",
+    "folderType": "clothing",
+    "category": "outerwear",
+    "tags": {
+      "auto": [
+        "color:gray",
+        "price:80",
+        "category:outerwear"
+      ],
+      "manual": []
+    },
+    "addedDate": "2025-09-15T22:15:30.539Z"
+  },
+  {
+    "id": 7,
+    "name": "Brown Trench Coat",
+    "imageUrl": "https://via.placeholder.com/400x400/brown/FFFFFF?text=Brown%20Trench%20Coat",
+    "folderType": "clothing",
+    "category": "outerwear",
+    "tags": {
+      "auto": [
+        "color:brown",
+        "price:200",
+        "category:outerwear"
+      ],
+      "manual": []
+    },
+    "addedDate": "2025-09-15T22:15:30.539Z"
+  },
+  {
+    "id": 8,
+    "name": "White Bomber Jacket",
+    "imageUrl": "https://via.placeholder.com/400x400/white/FFFFFF?text=White%20Bomber%20Jacket",
+    "folderType": "clothing",
+    "category": "outerwear",
+    "tags": {
+      "auto": [
+        "color:white",
+        "price:100",
+        "category:outerwear"
+      ],
+      "manual": []
+    },
+    "addedDate": "2025-09-15T22:15:30.539Z"
+  },
+  {
+    "id": 9,
+    "name": "Red Hoodie",
+    "imageUrl": "https://via.placeholder.com/400x400/red/FFFFFF?text=Red%20Hoodie",
+    "folderType": "clothing",
+    "category": "outerwear",
+    "tags": {
+      "auto": [
+        "color:red",
+        "price:60",
+        "category:outerwear"
+      ],
+      "manual": []
+    },
+    "addedDate": "2025-09-15T22:15:30.539Z"
+  },
+  {
+    "id": 10,
+    "name": "Black Leather Belt",
+    "imageUrl": "https://via.placeholder.com/400x400/black/FFFFFF?text=Black%20Leather%20Belt",
+    "folderType": "clothing",
+    "category": "accessories",
+    "tags": {
+      "auto": [
+        "color:black",
+        "price:40",
+        "category:accessories"
+      ],
+      "manual": []
+    },
+    "addedDate": "2025-09-15T22:15:30.539Z"
+  },
+  {
+    "id": 11,
+    "name": "Brown Leather Bag",
+    "imageUrl": "https://via.placeholder.com/400x400/brown/FFFFFF?text=Brown%20Leather%20Bag",
+    "folderType": "clothing",
+    "category": "accessories",
+    "tags": {
+      "auto": [
+        "color:brown",
+        "price:80",
+        "category:accessories"
+      ],
+      "manual": []
+    },
+    "addedDate": "2025-09-15T22:15:30.539Z"
+  },
+  {
+    "id": 12,
+    "name": "Blue Scarf",
+    "imageUrl": "https://via.placeholder.com/400x400/blue/FFFFFF?text=Blue%20Scarf",
+    "folderType": "clothing",
+    "category": "accessories",
+    "tags": {
+      "auto": [
+        "color:blue",
+        "price:25",
+        "category:accessories"
+      ],
+      "manual": []
+    },
+    "addedDate": "2025-09-15T22:15:30.539Z"
+  },
+  {
+    "id": 13,
+    "name": "Gray Beanie",
+    "imageUrl": "https://via.placeholder.com/400x400/gray/FFFFFF?text=Gray%20Beanie",
+    "folderType": "clothing",
+    "category": "accessories",
+    "tags": {
+      "auto": [
+        "color:gray",
+        "price:20",
+        "category:accessories"
+      ],
+      "manual": []
+    },
+    "addedDate": "2025-09-15T22:15:30.539Z"
+  },
+  {
+    "id": 14,
+    "name": "Gold Watch",
+    "imageUrl": "https://via.placeholder.com/400x400/FFD700/FFFFFF?text=Gold%20Watch",
+    "folderType": "clothing",
+    "category": "accessories",
+    "tags": {
+      "auto": [
+        "color:gold",
+        "price:200",
+        "category:accessories"
+      ],
+      "manual": []
+    },
+    "addedDate": "2025-09-15T22:15:30.539Z"
+  },
+  {
+    "id": 15,
+    "name": "Black Sunglasses",
+    "imageUrl": "https://via.placeholder.com/400x400/black/FFFFFF?text=Black%20Sunglasses",
+    "folderType": "clothing",
+    "category": "accessories",
+    "tags": {
+      "auto": [
+        "color:black",
+        "price:50",
+        "category:accessories"
+      ],
+      "manual": []
+    },
+    "addedDate": "2025-09-15T22:15:30.539Z"
+  },
+  {
+    "id": 16,
+    "name": "Blue Jeans",
+    "imageUrl": "https://via.placeholder.com/400x400/blue/FFFFFF?text=Blue%20Jeans",
+    "folderType": "clothing",
+    "category": "bottoms",
+    "tags": {
+      "auto": [
+        "color:blue",
+        "price:70",
+        "category:bottoms"
+      ],
+      "manual": []
+    },
+    "addedDate": "2025-09-15T22:15:30.539Z"
+  },
+  {
+    "id": 17,
+    "name": "Black Trousers",
+    "imageUrl": "https://via.placeholder.com/400x400/black/FFFFFF?text=Black%20Trousers",
+    "folderType": "clothing",
+    "category": "bottoms",
+    "tags": {
+      "auto": [
+        "color:black",
+        "price:60",
+        "category:bottoms"
+      ],
+      "manual": []
+    },
+    "addedDate": "2025-09-15T22:15:30.539Z"
+  },
+  {
+    "id": 18,
+    "name": "Gray Chinos",
+    "imageUrl": "https://via.placeholder.com/400x400/gray/FFFFFF?text=Gray%20Chinos",
+    "folderType": "clothing",
+    "category": "bottoms",
+    "tags": {
+      "auto": [
+        "color:gray",
+        "price:55",
+        "category:bottoms"
+      ],
+      "manual": []
+    },
+    "addedDate": "2025-09-15T22:15:30.539Z"
+  },
+  {
+    "id": 19,
+    "name": "White Shorts",
+    "imageUrl": "https://via.placeholder.com/400x400/white/FFFFFF?text=White%20Shorts",
+    "folderType": "clothing",
+    "category": "bottoms",
+    "tags": {
+      "auto": [
+        "color:white",
+        "price:35",
+        "category:bottoms"
+      ],
+      "manual": []
+    },
+    "addedDate": "2025-09-15T22:15:30.539Z"
+  },
+  {
+    "id": 20,
+    "name": "Navy Skirt",
+    "imageUrl": "https://via.placeholder.com/400x400/1E3A8A/FFFFFF?text=Navy%20Skirt",
+    "folderType": "clothing",
+    "category": "bottoms",
+    "tags": {
+      "auto": [
+        "color:navy",
+        "price:45",
+        "category:bottoms"
+      ],
+      "manual": []
+    },
+    "addedDate": "2025-09-15T22:15:30.539Z"
+  },
+  {
+    "id": 21,
+    "name": "Brown Leggings",
+    "imageUrl": "https://via.placeholder.com/400x400/brown/FFFFFF?text=Brown%20Leggings",
+    "folderType": "clothing",
+    "category": "bottoms",
+    "tags": {
+      "auto": [
+        "color:brown",
+        "price:30",
+        "category:bottoms"
+      ],
+      "manual": []
+    },
+    "addedDate": "2025-09-15T22:15:30.539Z"
+  },
+  {
+    "id": 22,
+    "name": "White T-Shirt",
+    "imageUrl": "https://via.placeholder.com/400x400/white/FFFFFF?text=White%20T-Shirt",
+    "folderType": "clothing",
+    "category": "tops",
+    "tags": {
+      "auto": [
+        "color:white",
+        "price:20",
+        "category:tops"
+      ],
+      "manual": []
+    },
+    "addedDate": "2025-09-15T22:15:30.539Z"
+  },
+  {
+    "id": 23,
+    "name": "Black Blouse",
+    "imageUrl": "https://via.placeholder.com/400x400/black/FFFFFF?text=Black%20Blouse",
+    "folderType": "clothing",
+    "category": "tops",
+    "tags": {
+      "auto": [
+        "color:black",
+        "price:40",
+        "category:tops"
+      ],
+      "manual": []
+    },
+    "addedDate": "2025-09-15T22:15:30.539Z"
+  },
+  {
+    "id": 24,
+    "name": "Blue Shirt",
+    "imageUrl": "https://via.placeholder.com/400x400/blue/FFFFFF?text=Blue%20Shirt",
+    "folderType": "clothing",
+    "category": "tops",
+    "tags": {
+      "auto": [
+        "color:blue",
+        "price:35",
+        "category:tops"
+      ],
+      "manual": []
+    },
+    "addedDate": "2025-09-15T22:15:30.539Z"
+  },
+  {
+    "id": 25,
+    "name": "Gray Sweater",
+    "imageUrl": "https://via.placeholder.com/400x400/gray/FFFFFF?text=Gray%20Sweater",
+    "folderType": "clothing",
+    "category": "tops",
+    "tags": {
+      "auto": [
+        "color:gray",
+        "price:50",
+        "category:tops"
+      ],
+      "manual": []
+    },
+    "addedDate": "2025-09-15T22:15:30.539Z"
+  },
+  {
+    "id": 26,
+    "name": "Red Tank Top",
+    "imageUrl": "https://via.placeholder.com/400x400/red/FFFFFF?text=Red%20Tank%20Top",
+    "folderType": "clothing",
+    "category": "tops",
+    "tags": {
+      "auto": [
+        "color:red",
+        "price:15",
+        "category:tops"
+      ],
+      "manual": []
+    },
+    "addedDate": "2025-09-15T22:15:30.539Z"
+  },
+  {
+    "id": 27,
+    "name": "Green Polo",
+    "imageUrl": "https://via.placeholder.com/400x400/green/FFFFFF?text=Green%20Polo",
+    "folderType": "clothing",
+    "category": "tops",
+    "tags": {
+      "auto": [
+        "color:green",
+        "price:30",
+        "category:tops"
+      ],
+      "manual": []
+    },
+    "addedDate": "2025-09-15T22:15:30.539Z"
+  },
+  {
+    "id": 28,
+    "name": "Black Sneakers",
+    "imageUrl": "https://via.placeholder.com/400x400/black/FFFFFF?text=Black%20Sneakers",
+    "folderType": "clothing",
+    "category": "shoes",
+    "tags": {
+      "auto": [
+        "color:black",
+        "price:90",
+        "category:shoes"
+      ],
+      "manual": []
+    },
+    "addedDate": "2025-09-15T22:15:30.539Z"
+  },
+  {
+    "id": 29,
+    "name": "Brown Boots",
+    "imageUrl": "https://via.placeholder.com/400x400/brown/FFFFFF?text=Brown%20Boots",
+    "folderType": "clothing",
+    "category": "shoes",
+    "tags": {
+      "auto": [
+        "color:brown",
+        "price:120",
+        "category:shoes"
+      ],
+      "manual": []
+    },
+    "addedDate": "2025-09-15T22:15:30.539Z"
+  },
+  {
+    "id": 30,
+    "name": "White Flats",
+    "imageUrl": "https://via.placeholder.com/400x400/white/FFFFFF?text=White%20Flats",
+    "folderType": "clothing",
+    "category": "shoes",
+    "tags": {
+      "auto": [
+        "color:white",
+        "price:60",
+        "category:shoes"
+      ],
+      "manual": []
+    },
+    "addedDate": "2025-09-15T22:15:30.539Z"
+  },
+  {
+    "id": 31,
+    "name": "Navy Loafers",
+    "imageUrl": "https://via.placeholder.com/400x400/1E3A8A/FFFFFF?text=Navy%20Loafers",
+    "folderType": "clothing",
+    "category": "shoes",
+    "tags": {
+      "auto": [
+        "color:navy",
+        "price:80",
+        "category:shoes"
+      ],
+      "manual": []
+    },
+    "addedDate": "2025-09-15T22:15:30.539Z"
+  },
+  {
+    "id": 32,
+    "name": "Red Heels",
+    "imageUrl": "https://via.placeholder.com/400x400/red/FFFFFF?text=Red%20Heels",
+    "folderType": "clothing",
+    "category": "shoes",
+    "tags": {
+      "auto": [
+        "color:red",
+        "price:70",
+        "category:shoes"
+      ],
+      "manual": []
+    },
+    "addedDate": "2025-09-15T22:15:30.539Z"
+  },
+  {
+    "id": 33,
+    "name": "Gray Sandals",
+    "imageUrl": "https://via.placeholder.com/400x400/gray/FFFFFF?text=Gray%20Sandals",
+    "folderType": "clothing",
+    "category": "shoes",
+    "tags": {
+      "auto": [
+        "color:gray",
+        "price:40",
+        "category:shoes"
+      ],
+      "manual": []
+    },
+    "addedDate": "2025-09-15T22:15:30.539Z"
   }
 ]

@@ -19,7 +19,7 @@ class ImageProcessor {
                 categories: ['color', 'size', 'price', 'room']
             },
             '33plus7': {
-                id: '1ABC123DEF456GHI789JKL012MNO345PQR', // Replace with actual 33+7 folder ID
+                id: '1DkEZ1NcOBmg9ljWJ2JKeZ_Hdy5Vc0KNq', // Your 33+7 folder ID
                 type: 'clothing',
                 categories: ['outerwear', 'accessories', 'bottoms', 'tops', 'shoes']
             }
