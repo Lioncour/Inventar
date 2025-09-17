@@ -212,14 +212,108 @@
         }
         
         .nav-label {
-            color: #999999;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
+            color: #1a1a1a;
+            font-size: 1.25rem;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .about-button {
+            background: #1a1a1a;
+            color: #ffffff;
+            border: none;
+            padding: 8px 16px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-radius: 4px;
+        }
+        
+        .about-button:hover {
+            background: #333333;
+            transform: translateY(-1px);
         }
         
         .main-content {
             padding: 0 20px 40px;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+        
+        .modal-content {
+            background-color: #ffffff;
+            margin: 5% auto;
+            padding: 40px;
+            border: 1px solid #e5e5e5;
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .close {
+            color: #999999;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            transition: color 0.2s ease;
+        }
+        
+        .close:hover {
+            color: #1a1a1a;
+        }
+        
+        .modal h2 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+        }
+        
+        .modal p {
+            margin-bottom: 16px;
+            line-height: 1.6;
+            color: #666666;
+        }
+        
+        .modal .rules {
+            background: #f8f8f8;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #1a1a1a;
+        }
+        
+        .modal .links {
+            margin-top: 30px;
+        }
+        
+        .modal .links a {
+            color: #1a1a1a;
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 1px solid #1a1a1a;
+            transition: all 0.2s ease;
+        }
+        
+        .modal .links a:hover {
+            color: #666666;
+            border-bottom-color: #666666;
         }
         
         .loading-container {
@@ -304,12 +398,10 @@
     <nav class="nav fixed top-0 left-0 right-0 z-50">
         <div class="px-6 lg:px-8">
             <div class="flex justify-between items-center py-6">
-                <a href="index.html" class="nav-link">
-                    ← Inventar
-                </a>
                 <div class="nav-label">
-                    Capsule Wardrobe
+                    33+7
                 </div>
+                <button class="about-button" onclick="openAboutModal()">About</button>
             </div>
         </div>
     </nav>
@@ -318,15 +410,9 @@
     <section class="hero-section">
         <h1 class="hero-title">33+7</h1>
         <p class="hero-subtitle">
-            A minimalist capsule wardrobe system. 33 core pieces for 3 months, 
-            plus 7 seasonal additions. Quality over quantity, style over trends.
+            40 essential clothing pieces that work together in perfect harmony.
         </p>
     </section>
-
-    <!-- Capsule Explanation -->
-    <div class="capsule-explanation">
-        <p>33 core pieces + 7 seasonal additions = complete wardrobe</p>
-    </div>
 
     <!-- Main Content -->
     <main class="main-content">
@@ -348,6 +434,28 @@
             <p>Add some clothing images to your Google Drive folder to get started.</p>
         </div>
     </main>
+
+    <!-- About Modal -->
+    <div id="aboutModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAboutModal()">&times;</span>
+            <h2>About 33+7</h2>
+            <p>The 33+7 capsule wardrobe system is a minimalist approach to fashion that emphasizes quality over quantity and intentional choices over impulse purchases.</p>
+            
+            <div class="rules">
+                <h3 style="margin-bottom: 12px; font-family: 'JetBrains Mono', monospace;">The Rules</h3>
+                <p><strong>33 Core Pieces:</strong> Essential items that form the foundation of your wardrobe for 3 months. These are versatile, high-quality pieces that work together seamlessly.</p>
+                <p><strong>7 Seasonal Additions:</strong> Items that rotate throughout the year based on weather, occasions, or personal preference. These keep your wardrobe fresh and adaptable.</p>
+                <p><strong>Total: 40 Items Maximum</strong> - This constraint forces intentional choices and reduces decision fatigue while maximizing style and versatility.</p>
+            </div>
+            
+            <p>This system promotes sustainable fashion, reduces waste, and helps you build a wardrobe that truly reflects your personal style.</p>
+            
+            <div class="links">
+                <p><strong>Visit my website:</strong> <a href="https://janandersekroll.no" target="_blank">janandersekroll.no</a></p>
+            </div>
+        </div>
+    </div>
 
     <script>
         class CapsuleWardrobe {
@@ -603,6 +711,23 @@ Tags: ${allTags.join(', ') || 'None'}
         }
 
         // Initialize the capsule wardrobe
+        // Modal functions
+        function openAboutModal() {
+            document.getElementById('aboutModal').style.display = 'block';
+        }
+        
+        function closeAboutModal() {
+            document.getElementById('aboutModal').style.display = 'none';
+        }
+        
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            const modal = document.getElementById('aboutModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             new CapsuleWardrobe();
         });
