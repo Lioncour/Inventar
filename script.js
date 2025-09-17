@@ -23,29 +23,14 @@ class InventarApp {
     }
 
     setupEventListeners() {
-
-        // Filter functionality
-        document.getElementById('filterBtn').addEventListener('click', () => {
-            this.openFilterModal();
-        });
-
-        document.getElementById('clearFiltersBtn').addEventListener('click', () => {
-            this.clearAllFilters();
-        });
-
-        // Filter modal events
-        document.getElementById('applyFilters').addEventListener('click', () => {
-            this.applyFilters();
-        });
-
-        document.getElementById('clearAllFilters').addEventListener('click', () => {
-            this.clearAllFilters();
-        });
-
-        // Filter option clicks
+        // Filter pill clicks
         document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('filter-option')) {
-                this.toggleFilterOption(e.target);
+            if (e.target.classList.contains('filter-pill')) {
+                if (e.target.id === 'clearAllFilters') {
+                    this.clearAllFilters();
+                } else {
+                    this.toggleFilterPill(e.target);
+                }
             }
         });
 
@@ -258,6 +243,21 @@ class InventarApp {
         }
     }
 
+    toggleFilterPill(pill) {
+        const type = pill.dataset.type;
+        const value = pill.dataset.value;
+        
+        if (this.activeFilters[type].includes(value)) {
+            this.activeFilters[type] = this.activeFilters[type].filter(v => v !== value);
+            pill.classList.remove('active');
+        } else {
+            this.activeFilters[type].push(value);
+            pill.classList.add('active');
+        }
+        
+        this.filterItems();
+    }
+
     updateFilterOptions() {
         // Update filter option states based on active filters
         document.querySelectorAll('.filter-option').forEach(option => {
@@ -285,13 +285,18 @@ class InventarApp {
             price: []
         };
         
-        // Update UI
+        // Update UI - clear both old filter options and new filter pills
         document.querySelectorAll('.filter-option').forEach(option => {
             option.classList.remove('active');
         });
         
+        document.querySelectorAll('.filter-pill').forEach(pill => {
+            if (pill.id !== 'clearAllFilters') {
+                pill.classList.remove('active');
+            }
+        });
+        
         this.filterItems();
-        this.closeFilterModal();
     }
 
     filterItems() {
