@@ -24,12 +24,12 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border: none;
             background: #ffffff;
-            border-radius: 8px;
+            border-radius: 0;
             overflow: hidden;
         }
         .grid-item:hover {
-            transform: translateY(-4px) scale(1.02);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
         }
         #gridContainer {
             transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
@@ -213,7 +213,7 @@
         
         /* Minimalist Grid */
         #gridContainer {
-            gap: 12px;
+            gap: 4px;
         }
         
         .grid-item img {
