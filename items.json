@@ -634,5 +634,96 @@
       "manual": []
     },
     "addedDate": "2025-09-15T22:15:30.539Z"
+  },
+  {
+    "id": "2025-09-18T18:40:28.156Z",
+    "imageUrl": "images/jacket.webp",
+    "folderType": "clothing",
+    "category": "outerwear",
+    "tags": {
+      "auto": [
+        "color:unknown",
+        "style:casual"
+      ],
+      "manual": []
+    }
+  },
+  {
+    "id": "2025-09-18T18:40:29.021Z",
+    "imageUrl": "images/sko.jpg",
+    "folderType": "clothing",
+    "category": "outerwear",
+    "tags": {
+      "auto": [
+        "color:unknown",
+        "style:casual"
+      ],
+      "manual": []
+    }
+  },
+  {
+    "id": "2025-09-18T18:40:30.034Z",
+    "imageUrl": "images/bukse.webp",
+    "folderType": "clothing",
+    "category": "outerwear",
+    "tags": {
+      "auto": [
+        "color:unknown",
+        "style:casual"
+      ],
+      "manual": []
+    }
+  },
+  {
+    "id": "2025-09-18T18:40:30.928Z",
+    "imageUrl": "images/pants.jpg",
+    "folderType": "clothing",
+    "category": "bottoms",
+    "tags": {
+      "auto": [
+        "color:unknown",
+        "style:casual"
+      ],
+      "manual": []
+    }
+  },
+  {
+    "id": "2025-09-18T18:40:32.199Z",
+    "imageUrl": "images/sweater.webp",
+    "folderType": "clothing",
+    "category": "tops",
+    "tags": {
+      "auto": [
+        "color:unknown",
+        "style:casual"
+      ],
+      "manual": []
+    }
+  },
+  {
+    "id": "2025-09-18T18:40:33.552Z",
+    "imageUrl": "images/shirt2.jpg",
+    "folderType": "clothing",
+    "category": "tops",
+    "tags": {
+      "auto": [
+        "color:unknown",
+        "style:casual"
+      ],
+      "manual": []
+    }
+  },
+  {
+    "id": "2025-09-18T18:40:35.251Z",
+    "imageUrl": "images/shirt.webp",
+    "folderType": "clothing",
+    "category": "tops",
+    "tags": {
+      "auto": [
+        "color:unknown",
+        "style:casual"
+      ],
+      "manual": []
+    }
   }
 ]
