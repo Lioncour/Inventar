@@ -135,6 +135,8 @@ class ImageProcessor {
     async removeBackground(imagePath) {
         try {
             console.log(`Attempting to remove background from: ${imagePath}`);
+            console.log(`REMOVE_BG_API_KEY exists: ${!!process.env.REMOVE_BG_API_KEY}`);
+            console.log(`REMOVE_BG_API_KEY length: ${process.env.REMOVE_BG_API_KEY ? process.env.REMOVE_BG_API_KEY.length : 0}`);
             
             if (!process.env.REMOVE_BG_API_KEY) {
                 console.error('REMOVE_BG_API_KEY not found in environment variables');
@@ -145,6 +147,7 @@ class ImageProcessor {
             formData.append('image_file', fs.createReadStream(imagePath));
             formData.append('size', 'auto');
 
+            console.log('Making API call to Remove.bg...');
             const response = await axios.post('https://api.remove.bg/v1.0/removebg', formData, {
                 headers: {
                     ...formData.getHeaders(),
@@ -153,13 +156,20 @@ class ImageProcessor {
                 responseType: 'arraybuffer'
             });
 
+            console.log(`Remove.bg API response status: ${response.status}`);
+            console.log(`Response data size: ${response.data.length} bytes`);
+
             const processedPath = imagePath.replace(/\.[^/.]+$/, '_processed.png');
             fs.writeFileSync(processedPath, response.data);
             
             console.log(`Successfully removed background. Saved to: ${processedPath}`);
             return processedPath;
         } catch (error) {
-            console.error('Error removing background:', error.response?.data || error.message);
+            console.error('Error removing background:');
+            console.error('Status:', error.response?.status);
+            console.error('Status Text:', error.response?.statusText);
+            console.error('Data:', error.response?.data);
+            console.error('Message:', error.message);
             console.log('Returning original image without background removal');
             // Return original image if background removal fails
             return imagePath;
