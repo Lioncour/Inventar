@@ -426,6 +426,16 @@
         </div>
     </main>
 
+    <!-- Item Modal -->
+    <div id="itemModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeItemModal()">&times;</span>
+            <div id="modalContent">
+                <!-- Modal content will be dynamically loaded here -->
+            </div>
+        </div>
+    </div>
+
     <!-- About Modal -->
     <div id="aboutModal" class="modal">
         <div class="modal-content">
@@ -634,22 +644,56 @@
             }
 
             showItemDetails(item) {
-                // Extract tags for display
+                this.openItemModal(item);
+            }
+
+            openItemModal(item) {
+                const modal = document.getElementById('itemModal');
+                const modalContent = document.getElementById('modalContent');
+                
                 const autoTags = item.tags?.auto || [];
                 const manualTags = item.tags?.manual || [];
                 const allTags = [...autoTags, ...manualTags];
                 
                 const itemName = item.name || item.id || 'Unknown Item';
                 const category = item.category || 'Unknown';
+                const price = item.price || 'Not specified';
                 
-                // Create a simple modal-like display
-                const details = `
-${itemName}
-Category: ${category}
-Tags: ${allTags.join(', ') || 'None'}
-                `.trim();
+                modalContent.innerHTML = `
+                    <div style="padding: 20px;">
+                        <div style="margin-bottom: 20px;">
+                            <img 
+                                src="${item.imageUrl}" 
+                                alt="${itemName}"
+                                style="width: 100%; max-width: 400px; height: auto; border-radius: 8px; margin-bottom: 16px;"
+                            >
+                        </div>
+                        <h2 style="font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; margin-bottom: 16px; color: #1a1a1a;">
+                            ${itemName}
+                        </h2>
+                        <div style="margin-bottom: 12px;">
+                            <strong>Category:</strong> ${category}
+                        </div>
+                        <div style="margin-bottom: 12px;">
+                            <strong>Price:</strong> ${price}
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <strong>Tags:</strong> 
+                            <div style="margin-top: 8px;">
+                                ${allTags.map(tag => `<span style="display: inline-block; background: #f5f5f5; color: #666; padding: 4px 8px; margin: 2px; border-radius: 12px; font-size: 0.875rem;">${tag}</span>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
                 
-                alert(details);
+                modal.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            }
+
+            closeItemModal() {
+                const modal = document.getElementById('itemModal');
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
             }
 
             showLoading(show) {
@@ -710,12 +754,23 @@ Tags: ${allTags.join(', ') || 'None'}
         function closeAboutModal() {
             document.getElementById('aboutModal').style.display = 'none';
         }
+
+        function closeItemModal() {
+            document.getElementById('itemModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
         
         // Close modal when clicking outside of it
         window.onclick = function(event) {
-            const modal = document.getElementById('aboutModal');
-            if (event.target == modal) {
-                modal.style.display = 'none';
+            const aboutModal = document.getElementById('aboutModal');
+            const itemModal = document.getElementById('itemModal');
+            
+            if (event.target == aboutModal) {
+                aboutModal.style.display = 'none';
+            }
+            if (event.target == itemModal) {
+                itemModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
             }
         }
 
