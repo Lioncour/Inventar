@@ -134,6 +134,13 @@ class ImageProcessor {
 
     async removeBackground(imagePath) {
         try {
+            console.log(`Attempting to remove background from: ${imagePath}`);
+            
+            if (!process.env.REMOVE_BG_API_KEY) {
+                console.error('REMOVE_BG_API_KEY not found in environment variables');
+                return imagePath;
+            }
+
             const formData = new FormData();
             formData.append('image_file', fs.createReadStream(imagePath));
             formData.append('size', 'auto');
@@ -149,9 +156,11 @@ class ImageProcessor {
             const processedPath = imagePath.replace(/\.[^/.]+$/, '_processed.png');
             fs.writeFileSync(processedPath, response.data);
             
+            console.log(`Successfully removed background. Saved to: ${processedPath}`);
             return processedPath;
         } catch (error) {
-            console.error('Error removing background:', error);
+            console.error('Error removing background:', error.response?.data || error.message);
+            console.log('Returning original image without background removal');
             // Return original image if background removal fails
             return imagePath;
         }
@@ -289,9 +298,11 @@ class ImageProcessor {
                         console.log(`Processing ${folderName} image: ${image.name}`);
                         
                         // Download image
+                        console.log(`Processing image: ${image.name} (${image.id})`);
                         const downloadedPath = await this.downloadImage(image.id, image.name);
                         
                         // Remove background
+                        console.log(`Removing background for: ${image.name}`);
                         const processedPath = await this.removeBackground(downloadedPath);
                         
                         // Analyze image for auto-tagging

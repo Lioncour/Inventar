@@ -23,13 +23,12 @@
         .grid-item {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border: none;
-            background: #ffffff;
+            background: transparent;
             border-radius: 0;
             overflow: hidden;
         }
         .grid-item:hover {
             transform: translateY(-2px) scale(1.01);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
         }
         #gridContainer {
             transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
@@ -209,8 +208,8 @@
         /* Minimalist Header */
         header {
             background: #ffffff;
-            border-bottom: 1px solid #e5e5e5;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-bottom: none;
+            box-shadow: none;
         }
         
         /* Minimalist Buttons */
@@ -368,7 +367,7 @@
 </head>
 <body class="bg-white min-h-screen">
     <!-- Header -->
-    <header class="bg-white shadow-sm border-b border-gray-200 fixed top-0 left-0 right-0 z-40">
+    <header class="bg-white fixed top-0 left-0 right-0 z-40">
         <div class="px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center py-4">
                 <div>
@@ -396,15 +395,12 @@
                 <div class="flex flex-wrap gap-2">
                     <!-- Color Filters -->
                     <button class="filter-pill" data-type="color" data-value="red">Red</button>
-                    <button class="filter-pill" data-type="color" data-value="blue">Blue</button>
                     <button class="filter-pill" data-type="color" data-value="green">Green</button>
-                    <button class="filter-pill" data-type="color" data-value="yellow">Yellow</button>
-                    <button class="filter-pill" data-type="color" data-value="purple">Purple</button>
-                    <button class="filter-pill" data-type="color" data-value="orange">Orange</button>
-                    <button class="filter-pill" data-type="color" data-value="pink">Pink</button>
-                    <button class="filter-pill" data-type="color" data-value="brown">Brown</button>
-                    <button class="filter-pill" data-type="color" data-value="gray">Gray</button>
+                    <button class="filter-pill" data-type="color" data-value="blue">Blue</button>
                     <button class="filter-pill" data-type="color" data-value="black">Black</button>
+                    <button class="filter-pill" data-type="color" data-value="white">White</button>
+                    <button class="filter-pill" data-type="color" data-value="yellow">Yellow</button>
+                    <button class="filter-pill" data-type="color" data-value="colorful">Colorful</button>
                 </div>
                 <div class="flex flex-wrap gap-2 ml-4">
                     <!-- Size Filters -->
@@ -412,24 +408,20 @@
                     <button class="filter-pill" data-type="size" data-value="small">Small</button>
                     <button class="filter-pill" data-type="size" data-value="medium">Medium</button>
                     <button class="filter-pill" data-type="size" data-value="large">Large</button>
-                    <button class="filter-pill" data-type="size" data-value="huge">Huge</button>
                 </div>
                 <div class="flex flex-wrap gap-2 ml-4">
                     <!-- Room Filters -->
                     <button class="filter-pill" data-type="room" data-value="bedroom">Bedroom</button>
-                    <button class="filter-pill" data-type="room" data-value="living room">Living Room</button>
+                    <button class="filter-pill" data-type="room" data-value="livingroom">Living Room</button>
                     <button class="filter-pill" data-type="room" data-value="kitchen">Kitchen</button>
-                    <button class="filter-pill" data-type="room" data-value="bathroom">Bathroom</button>
-                    <button class="filter-pill" data-type="room" data-value="office">Office</button>
                     <button class="filter-pill" data-type="room" data-value="garage">Garage</button>
+                    <button class="filter-pill" data-type="room" data-value="outdoor">Outdoor</button>
                 </div>
                 <div class="flex flex-wrap gap-2 ml-4">
                     <!-- Price Filters -->
-                    <button class="filter-pill" data-type="price" data-value="0-25">$0-25</button>
-                    <button class="filter-pill" data-type="price" data-value="25-50">$25-50</button>
-                    <button class="filter-pill" data-type="price" data-value="50-100">$50-100</button>
-                    <button class="filter-pill" data-type="price" data-value="100-200">$100-200</button>
-                    <button class="filter-pill" data-type="price" data-value="200+">$200+</button>
+                    <button class="filter-pill" data-type="price" data-value="cheap">Cheap</button>
+                    <button class="filter-pill" data-type="price" data-value="not cheap">Not Cheap</button>
+                    <button class="filter-pill" data-type="price" data-value="expensive">Expensive</button>
                 </div>
                 <button id="clearAllFilters" class="filter-pill clear-btn">Clear All</button>
             </div>
@@ -479,15 +471,12 @@
                         <h3 class="text-lg font-semibold text-gray-800 mb-3">Color</h3>
                         <div class="flex flex-wrap gap-2">
                             <button class="filter-option" data-type="color" data-value="red">Red</button>
-                            <button class="filter-option" data-type="color" data-value="blue">Blue</button>
                             <button class="filter-option" data-type="color" data-value="green">Green</button>
-                            <button class="filter-option" data-type="color" data-value="yellow">Yellow</button>
-                            <button class="filter-option" data-type="color" data-value="purple">Purple</button>
-                            <button class="filter-option" data-type="color" data-value="orange">Orange</button>
-                            <button class="filter-option" data-type="color" data-value="pink">Pink</button>
-                            <button class="filter-option" data-type="color" data-value="brown">Brown</button>
-                            <button class="filter-option" data-type="color" data-value="gray">Gray</button>
+                            <button class="filter-option" data-type="color" data-value="blue">Blue</button>
                             <button class="filter-option" data-type="color" data-value="black">Black</button>
+                            <button class="filter-option" data-type="color" data-value="white">White</button>
+                            <button class="filter-option" data-type="color" data-value="yellow">Yellow</button>
+                            <button class="filter-option" data-type="color" data-value="colorful">Colorful</button>
                         </div>
                     </div>
 
@@ -499,7 +488,6 @@
                             <button class="filter-option" data-type="size" data-value="small">Small</button>
                             <button class="filter-option" data-type="size" data-value="medium">Medium</button>
                             <button class="filter-option" data-type="size" data-value="large">Large</button>
-                            <button class="filter-option" data-type="size" data-value="huge">Huge</button>
                         </div>
                     </div>
 
@@ -508,11 +496,10 @@
                         <h3 class="text-lg font-semibold text-gray-800 mb-3">Room</h3>
                         <div class="flex flex-wrap gap-2">
                             <button class="filter-option" data-type="room" data-value="bedroom">Bedroom</button>
-                            <button class="filter-option" data-type="room" data-value="living room">Living Room</button>
+                            <button class="filter-option" data-type="room" data-value="livingroom">Living Room</button>
                             <button class="filter-option" data-type="room" data-value="kitchen">Kitchen</button>
-                            <button class="filter-option" data-type="room" data-value="bathroom">Bathroom</button>
-                            <button class="filter-option" data-type="room" data-value="office">Office</button>
                             <button class="filter-option" data-type="room" data-value="garage">Garage</button>
+                            <button class="filter-option" data-type="room" data-value="outdoor">Outdoor</button>
                         </div>
                     </div>
 
@@ -520,11 +507,9 @@
                     <div>
                         <h3 class="text-lg font-semibold text-gray-800 mb-3">Price Range</h3>
                         <div class="flex flex-wrap gap-2">
-                            <button class="filter-option" data-type="price" data-value="0-25">$0 - $25</button>
-                            <button class="filter-option" data-type="price" data-value="25-50">$25 - $50</button>
-                            <button class="filter-option" data-type="price" data-value="50-100">$50 - $100</button>
-                            <button class="filter-option" data-type="price" data-value="100-200">$100 - $200</button>
-                            <button class="filter-option" data-type="price" data-value="200+">$200+</button>
+                            <button class="filter-option" data-type="price" data-value="cheap">Cheap</button>
+                            <button class="filter-option" data-type="price" data-value="not cheap">Not Cheap</button>
+                            <button class="filter-option" data-type="price" data-value="expensive">Expensive</button>
                         </div>
                     </div>
                 </div>
