@@ -297,9 +297,16 @@ class ImageProcessor {
                     .filter(item => item.folderType === folderConfig.type)
                     .map(item => path.basename(item.imageUrl));
 
-                const newImages = driveImages.filter(image => 
-                    !existingImageNames.includes(image.name)
-                );
+                // Filter out images that have already been processed (have _processed.png suffix)
+                const processedImageNames = existingImageNames
+                    .filter(name => name.includes('_processed.png'))
+                    .map(name => name.replace('_processed.png', ''));
+
+                const newImages = driveImages.filter(image => {
+                    const baseName = image.name.replace(/\.[^/.]+$/, ''); // Remove extension
+                    return !existingImageNames.includes(image.name) && 
+                           !processedImageNames.includes(baseName);
+                });
 
                 console.log(`Found ${newImages.length} new images to process in ${folderName}`);
 
@@ -311,9 +318,19 @@ class ImageProcessor {
                         console.log(`Processing image: ${image.name} (${image.id})`);
                         const downloadedPath = await this.downloadImage(image.id, image.name);
                         
-                        // Remove background
-                        console.log(`Removing background for: ${image.name}`);
-                        const processedPath = await this.removeBackground(downloadedPath);
+                        // Check if this image has already been processed
+                        const baseName = image.name.replace(/\.[^/.]+$/, '');
+                        const expectedProcessedPath = `${baseName}_processed.png`;
+                        
+                        let processedPath;
+                        if (fs.existsSync(expectedProcessedPath)) {
+                            console.log(`Processed version already exists for: ${image.name}, skipping background removal`);
+                            processedPath = expectedProcessedPath;
+                        } else {
+                            // Remove background
+                            console.log(`Removing background for: ${image.name}`);
+                            processedPath = await this.removeBackground(downloadedPath);
+                        }
                         
                         // Analyze image for auto-tagging
                         const autoTags = await this.analyzeImage(processedPath, folderConfig.type);
