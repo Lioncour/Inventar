@@ -299,6 +299,8 @@ class InventarApp {
             }
         });
         
+        // Reset grid container styles before filtering to prevent overlay
+        this.resetGridContainerStyles();
         this.filterItems();
     }
 
@@ -323,6 +325,12 @@ class InventarApp {
             // Complete animation - ensure opacity is fully reset
             gridContainer.style.opacity = '1';
             gridContainer.style.transform = 'scale(1)';
+            
+            // Double-check that opacity is reset after a short delay
+            setTimeout(() => {
+                gridContainer.style.opacity = '1';
+                gridContainer.style.transform = 'scale(1)';
+            }, 50);
         }, 200);
     }
 
