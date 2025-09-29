@@ -20,6 +20,7 @@ class InventarApp {
         this.setupEventListeners();
         await this.loadItems();
         this.setupInfiniteScroll();
+        this.resetGridContainerStyles();
     }
 
     setupEventListeners() {
@@ -319,7 +320,7 @@ class InventarApp {
             this.renderItems();
             this.updateActiveFiltersDisplay();
             
-            // Complete animation
+            // Complete animation - ensure opacity is fully reset
             gridContainer.style.opacity = '1';
             gridContainer.style.transform = 'scale(1)';
         }, 200);
@@ -486,6 +487,14 @@ class InventarApp {
         } else {
             emptyState.style.display = 'none';
             gridContainer.style.display = 'grid';
+        }
+    }
+
+    resetGridContainerStyles() {
+        const gridContainer = document.getElementById('gridContainer');
+        if (gridContainer) {
+            gridContainer.style.opacity = '1';
+            gridContainer.style.transform = 'scale(1)';
         }
     }
 
