@@ -46,10 +46,11 @@
         }
         .modal-content {
             position: relative;
-            margin: 5% auto;
+            margin: 2% auto;
             padding: 0;
-            width: 90%;
-            max-width: 800px;
+            width: 95%;
+            max-width: 1200px;
+            max-height: 90vh;
             background: #ffffff;
             border: none;
             border-radius: 12px;
@@ -362,6 +363,24 @@
         
         .text-blue-900 {
             color: #1a1a1a !important;
+        }
+        
+        /* Responsive Modal */
+        @media (max-width: 768px) {
+            .modal-content {
+                width: 98%;
+                margin: 1% auto;
+                max-height: 95vh;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .modal-content {
+                width: 100%;
+                margin: 0;
+                max-height: 100vh;
+                border-radius: 0;
+            }
         }
     </style>
 </head>

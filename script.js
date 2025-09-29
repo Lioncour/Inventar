@@ -177,10 +177,24 @@ class InventarApp {
                     <img 
                         src="${item.imageUrl}" 
                         alt="Item"
-                        class="w-full h-auto max-h-[80vh] object-contain rounded-lg shadow-lg"
+                        class="w-full h-auto max-h-[70vh] object-contain rounded-lg shadow-lg"
                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzk5YTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIG5vdCBmb3VuZDwvdGV4dD48L3N2Zz4='"
                     >
                 </div>
+                
+                ${allTags.length > 0 ? `
+                    <div class="mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-3">Tags</h3>
+                        <div class="flex flex-wrap gap-2">
+                            ${(item.tags.auto || []).map(tag => 
+                                `<span class="tag auto">${tag}</span>`
+                            ).join('')}
+                            ${(item.tags.manual || []).map(tag => 
+                                `<span class="tag manual">${tag}</span>`
+                            ).join('')}
+                        </div>
+                    </div>
+                ` : ''}
             </div>
         `;
         
@@ -285,9 +299,8 @@ class InventarApp {
             }
         });
         
-        // Reset grid container styles before filtering to prevent overlay
-        this.resetGridContainerStyles();
-        this.filterItems();
+        // Filter items without animation to prevent overlay
+        this.filterItemsWithoutAnimation();
     }
 
     filterItems() {
@@ -318,6 +331,24 @@ class InventarApp {
                 gridContainer.style.transform = 'scale(1)';
             }, 50);
         }, 200);
+    }
+
+    filterItemsWithoutAnimation() {
+        const gridContainer = document.getElementById('gridContainer');
+        
+        // Ensure grid container is fully visible
+        gridContainer.style.opacity = '1';
+        gridContainer.style.transform = 'scale(1)';
+        
+        this.filteredItems = this.items.filter(item => {
+            return this.itemMatchesFilters(item);
+        });
+        
+        this.currentPage = 0;
+        this.hasMoreItems = this.filteredItems.length > 0;
+        
+        this.renderItems();
+        this.updateActiveFiltersDisplay();
     }
 
     itemMatchesFilters(item) {

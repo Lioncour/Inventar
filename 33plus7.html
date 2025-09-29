@@ -249,12 +249,12 @@
         
         .modal-content {
             background-color: #ffffff;
-            margin: 2% auto;
+            margin: 1% auto;
             padding: 40px;
             border: 1px solid #e5e5e5;
-            width: 95%;
-            max-width: 1200px;
-            max-height: 90vh;
+            width: 98%;
+            max-width: 1400px;
+            max-height: 95vh;
             position: relative;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             overflow-y: auto;
@@ -684,7 +684,7 @@
                             <img 
                                 src="${item.imageUrl}" 
                                 alt="${itemName}"
-                                style="width: 100%; max-width: 800px; max-height: 60vh; height: auto; object-fit: contain; border-radius: 8px; margin-bottom: 16px;"
+                                style="width: 100%; max-width: 1000px; max-height: 70vh; height: auto; object-fit: contain; border-radius: 8px; margin-bottom: 16px;"
                             >
                         </div>
                         <h2 style="font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; margin-bottom: 16px; color: #1a1a1a;">
@@ -780,6 +780,22 @@
                 document.body.style.overflow = 'auto';
             }
         }
+
+        // Close modals with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const aboutModal = document.getElementById('aboutModal');
+                const itemModal = document.getElementById('itemModal');
+                
+                if (aboutModal.style.display === 'block') {
+                    aboutModal.style.display = 'none';
+                }
+                if (itemModal.style.display === 'block') {
+                    itemModal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }
+            }
+        });
 
         document.addEventListener('DOMContentLoaded', () => {
             new CapsuleWardrobe();
