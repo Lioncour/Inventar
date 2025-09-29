@@ -90,7 +90,9 @@ class InventarApp {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             
-            this.items = await response.json();
+            const allItems = await response.json();
+            // Filter to only show inventar items, not clothing items
+            this.items = allItems.filter(item => item.folderType === 'inventar');
             this.filteredItems = [...this.items];
             this.currentPage = 0;
             this.hasMoreItems = this.items.length > 0;
@@ -144,7 +146,7 @@ class InventarApp {
         const itemDiv = document.createElement('div');
         itemDiv.className = 'grid-item cursor-pointer group';
         itemDiv.innerHTML = `
-            <div class="aspect-square bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <div class="aspect-square overflow-hidden">
                 <img 
                     src="${item.imageUrl}" 
                     alt="Item ${item.id}"
