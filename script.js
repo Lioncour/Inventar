@@ -258,7 +258,7 @@ class InventarApp {
             pill.classList.add('active');
         }
         
-        this.filterItems();
+        this.filterItemsWithoutAnimation();
     }
 
     updateFilterOptions() {
