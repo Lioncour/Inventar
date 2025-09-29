@@ -181,20 +181,6 @@ class InventarApp {
                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzk5YTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIG5vdCBmb3VuZDwvdGV4dD48L3N2Zz4='"
                     >
                 </div>
-                
-                ${allTags.length > 0 ? `
-                    <div class="mb-4">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-3">Tags</h3>
-                        <div class="flex flex-wrap gap-2">
-                            ${(item.tags.auto || []).map(tag => 
-                                `<span class="tag auto">${tag}</span>`
-                            ).join('')}
-                            ${(item.tags.manual || []).map(tag => 
-                                `<span class="tag manual">${tag}</span>`
-                            ).join('')}
-                        </div>
-                    </div>
-                ` : ''}
             </div>
         `;
         
