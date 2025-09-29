@@ -206,5 +206,31 @@
       ],
       "manual": []
     }
+  },
+  {
+    "id": "2025-09-29T08:52:29.462Z",
+    "imageUrl": "images/DSCF0001_processed.png",
+    "folderType": "inventar",
+    "category": "color",
+    "tags": {
+      "auto": [
+        "color:unknown",
+        "size:medium"
+      ],
+      "manual": []
+    }
+  },
+  {
+    "id": "2025-09-29T08:52:37.394Z",
+    "imageUrl": "images/DSCF0056_processed.png",
+    "folderType": "inventar",
+    "category": "color",
+    "tags": {
+      "auto": [
+        "color:unknown",
+        "size:medium"
+      ],
+      "manual": []
+    }
   }
 ]
