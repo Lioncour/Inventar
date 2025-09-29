@@ -180,5 +180,31 @@
       ],
       "manual": []
     }
+  },
+  {
+    "id": "2025-09-24T12:29:49.327Z",
+    "imageUrl": "images/Screenshot 2024-11-22 at 09.11.27 (1)_processed.png",
+    "folderType": "clothing",
+    "category": "outerwear",
+    "tags": {
+      "auto": [
+        "color:unknown",
+        "style:casual"
+      ],
+      "manual": []
+    }
+  },
+  {
+    "id": "2025-09-24T12:29:51.639Z",
+    "imageUrl": "images/sko_processed.png",
+    "folderType": "clothing",
+    "category": "outerwear",
+    "tags": {
+      "auto": [
+        "color:unknown",
+        "style:casual"
+      ],
+      "manual": []
+    }
   }
 ]
