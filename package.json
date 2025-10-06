@@ -19,7 +19,7 @@
   "author": "Your Name",
   "license": "MIT",
   "dependencies": {
-    "@google-cloud/storage": "^7.17.1",
+    "@google-cloud/storage": "^7.17.2",
     "axios": "^1.12.2",
     "form-data": "^4.0.4",
     "googleapis": "^128.0.0"
