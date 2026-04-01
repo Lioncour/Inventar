@@ -39,7 +39,7 @@ jobs:
         cache: npm
 
     - name: Install dependencies
-      run: npm ci --no-audit --no-fund
+      run: npm install --no-save --no-package-lock --no-audit --no-fund googleapis axios form-data
 
     - name: Create images directory
       run: mkdir -p images
