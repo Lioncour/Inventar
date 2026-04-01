@@ -39,7 +39,7 @@ jobs:
         cache: npm
 
     - name: Install dependencies
-      run: npm install --no-save --no-package-lock --no-audit --no-fund googleapis axios form-data
+      run: npm install --prefix .ci-node --no-save --no-package-lock --no-audit --no-fund googleapis axios form-data
 
     - name: Create images directory
       run: mkdir -p images
@@ -51,6 +51,7 @@ jobs:
         REMOVE_BG_API_KEY: ${{ secrets.REMOVE_BG_API_KEY }}
         IMAGGA_API_KEY: ${{ secrets.IMAGGA_API_KEY }}
         IMAGGA_API_SECRET: ${{ secrets.IMAGGA_API_SECRET }}
+        NODE_PATH: .ci-node/node_modules
       run: node process-images.js
 
     - name: Commit changes
