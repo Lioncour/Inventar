@@ -10,26 +10,36 @@ on:
     paths:
       - 'items.json'
 
+permissions:
+  contents: write
+
+concurrency:
+  group: process-images-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   process-images:
     runs-on: ubuntu-latest
+    env:
+      # Opt in early to the upcoming Actions runtime default.
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         fetch-depth: 0
+        ref: ${{ github.ref_name }}
 
     - name: Set up Node.js
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v5
       with:
-        node-version: '18'
+        node-version: '22'
+        cache: npm
 
     - name: Install dependencies
-      run: |
-        npm init -y
-        npm install @google-cloud/storage googleapis axios form-data
+      run: npm ci --no-audit --no-fund
 
     - name: Create images directory
       run: mkdir -p images
@@ -47,10 +57,11 @@ jobs:
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add .
+        git add items.json images
         if git diff --staged --quiet; then
           echo "No changes to commit"
         else
           git commit -m "Auto-update: Process new images from Google Drive"
-          git push
+          git pull --rebase origin "${GITHUB_REF_NAME}" || true
+          git push origin "HEAD:${GITHUB_REF_NAME}"
         fi
