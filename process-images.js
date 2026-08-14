@@ -84,7 +84,13 @@ class ImageProcessor {
     }
 
     saveItems() {
-        fs.writeFileSync(this.itemsFile, JSON.stringify(this.existingItems, null, 2) + '\n');
+        const next = JSON.stringify(this.existingItems, null, 2) + '\n';
+        const previous = fs.existsSync(this.itemsFile) ? fs.readFileSync(this.itemsFile, 'utf8') : '';
+        if (previous === next) {
+            console.log('No item changes to save');
+            return;
+        }
+        fs.writeFileSync(this.itemsFile, next);
         console.log(`Saved ${this.existingItems.length} items`);
     }
 
@@ -334,9 +340,36 @@ class ImageProcessor {
         });
     }
 
+    async checkRemoveBgAccount() {
+        if (!process.env.REMOVE_BG_API_KEY) {
+            console.warn('REMOVE_BG_API_KEY is not set; background removal will be skipped');
+            return false;
+        }
+
+        try {
+            const response = await axios.get('https://api.remove.bg/v1.0/account', {
+                headers: { 'X-Api-Key': process.env.REMOVE_BG_API_KEY },
+                timeout: 15000
+            });
+            const credits = response.data?.data?.attributes?.credits?.total;
+            const freeCalls = response.data?.data?.attributes?.api?.free_calls;
+            console.log(`remove.bg account OK. Credits: ${credits ?? 'unknown'}, free API calls: ${freeCalls ?? 'unknown'}`);
+            return true;
+        } catch (error) {
+            const status = error.response?.status;
+            console.error(`remove.bg account check failed: ${status || error.message}`);
+            return false;
+        }
+    }
+
     async processNewImages() {
         try {
             await this.init();
+            await this.checkRemoveBgAccount();
+
+            if (!process.env.IMAGGA_API_KEY || !process.env.IMAGGA_API_SECRET) {
+                console.warn('Imagga secrets are not set; auto-tagging will be skipped');
+            }
 
             for (const [folderName, folderConfig] of Object.entries(this.folders)) {
                 console.log(`\n=== Processing ${folderName.toUpperCase()} folder ===`);
