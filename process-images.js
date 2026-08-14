@@ -1,28 +1,22 @@
 const { google } = require('googleapis');
 const fs = require('fs');
 const path = require('path');
-const axios = require('axios');
-const FormData = require('form-data');
 
-const COLOR_PALETTE = [
-    'red', 'green', 'blue', 'black', 'white', 'yellow',
-    'purple', 'orange', 'pink', 'brown', 'gray', 'navy', 'beige'
-];
-
-const COLOR_ALIASES = {
-    grey: 'gray',
-    silver: 'gray',
-    gold: 'yellow',
-    golden: 'yellow',
-    navy: 'blue',
-    turquoise: 'blue',
-    teal: 'green',
-    khaki: 'beige',
-    cream: 'white',
-    ivory: 'white'
+const PALETTE_RGB = {
+    red: [200, 40, 40],
+    green: [40, 150, 70],
+    blue: [40, 80, 190],
+    black: [25, 25, 25],
+    white: [245, 245, 245],
+    yellow: [230, 200, 50],
+    purple: [130, 50, 170],
+    orange: [230, 120, 40],
+    pink: [230, 110, 160],
+    brown: [130, 80, 45],
+    gray: [140, 140, 140],
+    navy: [20, 40, 90],
+    beige: [210, 190, 160]
 };
-
-const SIZE_WORDS = ['tiny', 'small', 'medium', 'large'];
 
 class ImageProcessor {
     constructor() {
@@ -30,6 +24,7 @@ class ImageProcessor {
         this.itemsFile = 'items.json';
         this.imagesDir = 'images';
         this.existingItems = this.loadExistingItems();
+        this.removeBackgroundFn = null;
 
         this.folders = {
             inventar: {
@@ -61,8 +56,24 @@ class ImageProcessor {
         }
     }
 
+    imglyDistPath() {
+        const candidates = [
+            path.join(process.cwd(), '.ci-node', 'node_modules', '@imgly', 'background-removal-node', 'dist'),
+            path.join(process.cwd(), 'node_modules', '@imgly', 'background-removal-node', 'dist')
+        ];
+        const found = candidates.find((candidate) => fs.existsSync(candidate));
+        if (!found) {
+            throw new Error('Could not find @imgly/background-removal-node dist folder');
+        }
+        return `file://${found.replace(/\\/g, '/')}/`;
+    }
+
     async init() {
         const credentials = this.parseServiceAccountKey(process.env.GOOGLE_SERVICE_ACCOUNT_KEY);
+        if (credentials.client_email) {
+            console.log(`Google Drive service account: ${credentials.client_email}`);
+        }
+
         const auth = new google.auth.GoogleAuth({
             credentials,
             scopes: ['https://www.googleapis.com/auth/drive.readonly']
@@ -70,6 +81,10 @@ class ImageProcessor {
 
         this.drive = google.drive({ version: 'v3', auth });
         fs.mkdirSync(this.imagesDir, { recursive: true });
+
+        const imgly = await import('@imgly/background-removal-node');
+        this.removeBackgroundFn = imgly.removeBackground;
+        console.log(`Local background-removal model path: ${this.imglyDistPath()}`);
     }
 
     loadExistingItems() {
@@ -192,138 +207,73 @@ class ImageProcessor {
     }
 
     async removeBackground(imagePath) {
-        if (!process.env.REMOVE_BG_API_KEY) {
-            console.warn('REMOVE_BG_API_KEY not set; skipping background removal');
-            return imagePath;
-        }
-
         try {
-            const formData = new FormData();
-            formData.append('image_file', fs.createReadStream(imagePath));
-            formData.append('size', 'auto');
-
-            const response = await axios.post('https://api.remove.bg/v1.0/removebg', formData, {
-                headers: {
-                    ...formData.getHeaders(),
-                    'X-Api-Key': process.env.REMOVE_BG_API_KEY
+            const blob = await this.removeBackgroundFn(imagePath, {
+                publicPath: this.imglyDistPath(),
+                model: 'medium',
+                output: {
+                    format: 'image/png',
+                    type: 'foreground'
                 },
-                responseType: 'arraybuffer',
-                timeout: 60000,
-                maxContentLength: 20 * 1024 * 1024
+                progress: (key, current, total) => {
+                    if (total) {
+                        console.log(`Downloading ${key}: ${current}/${total}`);
+                    }
+                }
             });
 
             const processedPath = imagePath.replace(/\.[^/.]+$/, '_processed.png');
-            fs.writeFileSync(processedPath, response.data);
-            console.log(`Removed background: ${processedPath}`);
+            const buffer = Buffer.from(await blob.arrayBuffer());
+            fs.writeFileSync(processedPath, buffer);
+            console.log(`Removed background locally: ${processedPath}`);
             return processedPath;
         } catch (error) {
-            const status = error.response?.status;
-            console.error('Background removal failed:', status || error.message);
+            console.error('Local background removal failed:', error.message);
             return imagePath;
         }
     }
 
-    tagLabel(tag) {
-        if (!tag) return '';
-        if (typeof tag.tag === 'string') return tag.tag;
-        return tag.tag?.en || '';
+    nearestPaletteColor(r, g, b) {
+        let bestName = 'gray';
+        let bestDistance = Infinity;
+        for (const [name, [pr, pg, pb]] of Object.entries(PALETTE_RGB)) {
+            const distance = (r - pr) ** 2 + (g - pg) ** 2 + (b - pb) ** 2;
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                bestName = name;
+            }
+        }
+        return bestName;
     }
 
-    normalizeColor(label) {
-        const text = label.toLowerCase();
-        for (const [alias, mapped] of Object.entries(COLOR_ALIASES)) {
-            if (text.includes(alias)) return mapped;
-        }
-        return COLOR_PALETTE.find((color) => text.includes(color)) || null;
-    }
-
-    extractColors(tags) {
-        const found = [];
-        for (const tag of tags) {
-            if ((tag.confidence || 0) < 25) continue;
-            const color = this.normalizeColor(this.tagLabel(tag));
-            if (color && !found.includes(color)) found.push(color);
-        }
-        return found;
-    }
-
-    async analyzeImage(imagePath, folderType = 'inventar') {
-        const fallback = [];
-
-        if (!process.env.IMAGGA_API_KEY || !process.env.IMAGGA_API_SECRET) {
-            console.warn('Imagga credentials not set; skipping auto-tagging');
-            return fallback;
-        }
-
+    async analyzeImage(imagePath) {
         try {
-            const formData = new FormData();
-            formData.append('image', fs.createReadStream(imagePath));
+            const sharp = require('sharp');
+            const { data, info } = await sharp(imagePath).ensureAlpha().resize(64, 64, { fit: 'inside' }).raw().toBuffer({ resolveWithObject: true });
+            const counts = {};
+            let visible = 0;
 
-            const response = await axios.post('https://api.imagga.com/v2/tags', formData, {
-                headers: {
-                    ...formData.getHeaders(),
-                    Authorization: `Basic ${Buffer.from(`${process.env.IMAGGA_API_KEY}:${process.env.IMAGGA_API_SECRET}`).toString('base64')}`
-                },
-                timeout: 60000
-            });
+            for (let i = 0; i < data.length; i += info.channels) {
+                const alpha = info.channels > 3 ? data[i + 3] : 255;
+                if (alpha < 40) continue;
+                visible += 1;
+                const name = this.nearestPaletteColor(data[i], data[i + 1], data[i + 2]);
+                counts[name] = (counts[name] || 0) + 1;
+            }
 
-            const tags = response.data?.result?.tags || [];
-            return folderType === 'clothing'
-                ? this.analyzeClothingTags(tags)
-                : this.analyzeInventarTags(tags);
+            const ranked = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+            if (!visible || ranked.length === 0) return [];
+
+            const [topColor, topCount] = ranked[0];
+            const second = ranked[1];
+            if (second && second[1] / visible > 0.22 && topCount / visible < 0.55) {
+                return ['color:colorful'];
+            }
+            return [`color:${topColor}`];
         } catch (error) {
-            console.error('Image analysis failed:', error.response?.status || error.message);
-            return fallback;
+            console.warn('Local color analysis skipped:', error.message);
+            return [];
         }
-    }
-
-    analyzeClothingTags(tags) {
-        const autoTags = [];
-        const colors = this.extractColors(tags);
-
-        if (colors.length >= 3) {
-            autoTags.push('color:colorful');
-        } else if (colors.length > 0) {
-            autoTags.push(`color:${colors[0]}`);
-        }
-
-        const styleKeywords = ['casual', 'formal', 'sporty', 'elegant', 'vintage', 'modern', 'classic', 'trendy'];
-        const styleTag = tags.find((tag) => {
-            const label = this.tagLabel(tag).toLowerCase();
-            return (tag.confidence || 0) > 30 && styleKeywords.some((style) => label.includes(style));
-        });
-
-        if (styleTag) {
-            const label = this.tagLabel(styleTag).toLowerCase();
-            const style = styleKeywords.find((word) => label.includes(word));
-            autoTags.push(`style:${style}`);
-        }
-
-        return autoTags;
-    }
-
-    analyzeInventarTags(tags) {
-        const autoTags = [];
-        const colors = this.extractColors(tags);
-
-        if (colors.length >= 3) {
-            autoTags.push('color:colorful');
-        } else if (colors.length > 0) {
-            autoTags.push(`color:${colors[0]}`);
-        }
-
-        const sizeTag = tags.find((tag) => {
-            const label = this.tagLabel(tag).toLowerCase();
-            return (tag.confidence || 0) > 30 && SIZE_WORDS.some((size) => label.includes(size));
-        });
-
-        if (sizeTag) {
-            const label = this.tagLabel(sizeTag).toLowerCase();
-            const size = SIZE_WORDS.find((word) => label.includes(word));
-            autoTags.push(`size:${size}`);
-        }
-
-        return autoTags;
     }
 
     isAlreadyProcessed(image, folderType) {
@@ -340,36 +290,9 @@ class ImageProcessor {
         });
     }
 
-    async checkRemoveBgAccount() {
-        if (!process.env.REMOVE_BG_API_KEY) {
-            console.warn('REMOVE_BG_API_KEY is not set; background removal will be skipped');
-            return false;
-        }
-
-        try {
-            const response = await axios.get('https://api.remove.bg/v1.0/account', {
-                headers: { 'X-Api-Key': process.env.REMOVE_BG_API_KEY },
-                timeout: 15000
-            });
-            const credits = response.data?.data?.attributes?.credits?.total;
-            const freeCalls = response.data?.data?.attributes?.api?.free_calls;
-            console.log(`remove.bg account OK. Credits: ${credits ?? 'unknown'}, free API calls: ${freeCalls ?? 'unknown'}`);
-            return true;
-        } catch (error) {
-            const status = error.response?.status;
-            console.error(`remove.bg account check failed: ${status || error.message}`);
-            return false;
-        }
-    }
-
     async processNewImages() {
         try {
             await this.init();
-            await this.checkRemoveBgAccount();
-
-            if (!process.env.IMAGGA_API_KEY || !process.env.IMAGGA_API_SECRET) {
-                console.warn('Imagga secrets are not set; auto-tagging will be skipped');
-            }
 
             for (const [folderName, folderConfig] of Object.entries(this.folders)) {
                 console.log(`\n=== Processing ${folderName.toUpperCase()} folder ===`);
@@ -395,7 +318,7 @@ class ImageProcessor {
                             processedPath = await this.removeBackground(downloadedPath);
                         }
 
-                        const autoTags = await this.analyzeImage(processedPath, folderConfig.type);
+                        const autoTags = await this.analyzeImage(processedPath);
 
                         this.existingItems.push({
                             id: new Date().toISOString(),

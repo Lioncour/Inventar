@@ -14,17 +14,6 @@ const config = {
         }
     },
     
-    // API Keys
-    apis: {
-        removeBg: {
-            apiKey: 'YOUR_REMOVE_BG_API_KEY'
-        },
-        imagga: {
-            apiKey: 'YOUR_IMAGGA_API_KEY',
-            apiSecret: 'YOUR_IMAGGA_API_SECRET'
-        }
-    },
-    
     // Admin Panel
     admin: {
         password: 'admin123' // Change this for security
@@ -35,7 +24,7 @@ const config = {
         maxFileSize: 10 * 1024 * 1024, // 10MB
         allowedFormats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
         backgroundRemoval: {
-            size: 'auto', // auto, preview, full
+            engine: 'local', // @imgly/background-removal-node in GitHub Actions
             format: 'png'
         }
     },

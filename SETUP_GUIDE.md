@@ -13,11 +13,10 @@ Open http://localhost:8000
 - `GOOGLE_SERVICE_ACCOUNT_KEY`
 - `GOOGLE_DRIVE_FOLDER_ID` or `INVENTAR_FOLDER_ID`
 - `CLOTHING_FOLDER_ID` (optional if the 33+7 folder ID in `process-images.js` is already correct)
-- `REMOVE_BG_API_KEY`
-- `IMAGGA_API_KEY`
-- `IMAGGA_API_SECRET`
 
 Share both Google Drive folders with the service account email.
+
+Background removal and color tagging run locally in GitHub Actions. No remove.bg or Imagga keys are needed.
 
 ## Admin tags
 

@@ -15,6 +15,7 @@ concurrency:
 jobs:
   process-images:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
@@ -31,16 +32,41 @@ jobs:
       with:
         node-version: '22'
 
+    - name: Identify remove.bg account
+      env:
+        REMOVE_BG_API_KEY: ${{ secrets.REMOVE_BG_API_KEY }}
+      run: |
+        if [ -z "$REMOVE_BG_API_KEY" ]; then
+          echo "No REMOVE_BG_API_KEY secret set; skipping account lookup"
+          exit 0
+        fi
+        node -e "
+        (async () => {
+          const res = await fetch('https://api.remove.bg/v1.0/account', {
+            headers: { 'X-Api-Key': process.env.REMOVE_BG_API_KEY }
+          });
+          const json = await res.json();
+          if (!res.ok) {
+            console.error('remove.bg account lookup failed:', res.status);
+            console.error(JSON.stringify(json, null, 2));
+            process.exit(1);
+          }
+          const attrs = json.data && json.data.attributes ? json.data.attributes : json;
+          console.log('remove.bg account attributes (no API key):');
+          console.log(JSON.stringify(attrs, null, 2));
+        })().catch((error) => {
+          console.error(error.message);
+          process.exit(1);
+        });
+        "
+
     - name: Install dependencies
-      run: npm install --prefix .ci-node --no-save --no-package-lock --no-audit --no-fund googleapis axios form-data
+      run: npm install --prefix .ci-node --no-save --no-package-lock --no-audit --no-fund googleapis @imgly/background-removal-node
 
     - name: Process new images
       env:
         GOOGLE_DRIVE_FOLDER_ID: ${{ secrets.GOOGLE_DRIVE_FOLDER_ID }}
         GOOGLE_SERVICE_ACCOUNT_KEY: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}
-        REMOVE_BG_API_KEY: ${{ secrets.REMOVE_BG_API_KEY }}
-        IMAGGA_API_KEY: ${{ secrets.IMAGGA_API_KEY }}
-        IMAGGA_API_SECRET: ${{ secrets.IMAGGA_API_SECRET }}
         NODE_PATH: .ci-node/node_modules
       run: node process-images.js
 
