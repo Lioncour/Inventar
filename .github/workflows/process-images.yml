@@ -15,9 +15,11 @@ concurrency:
 jobs:
   process-images:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      BG_MODEL: birefnet-general
+      U2NET_HOME: ${{ github.workspace }}/.u2net-models
 
     steps:
     - name: Checkout repository
@@ -32,14 +34,33 @@ jobs:
       with:
         node-version: '22'
 
-    - name: Install dependencies
-      run: npm install --prefix .ci-node --no-save --no-package-lock --no-audit --no-fund googleapis @imgly/background-removal-node
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+        cache: pip
+        cache-dependency-path: requirements-bg.txt
+
+    - name: Cache background-removal models
+      uses: actions/cache@v4
+      with:
+        path: |
+          .u2net-models
+          ~/.cache/huggingface
+        key: rembg-birefnet-general-v1
+
+    - name: Install Node dependencies
+      run: npm install --prefix .ci-node --no-save --no-package-lock --no-audit --no-fund googleapis
+
+    - name: Install background-removal
+      run: pip install -r requirements-bg.txt
 
     - name: Process new images
       env:
         GOOGLE_DRIVE_FOLDER_ID: ${{ secrets.GOOGLE_DRIVE_FOLDER_ID }}
         GOOGLE_SERVICE_ACCOUNT_KEY: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}
         NODE_PATH: .ci-node/node_modules
+        PYTHON: python
       run: node process-images.js
 
     - name: Commit changes

@@ -1,22 +1,7 @@
 const { google } = require('googleapis');
+const { spawnSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-
-const PALETTE_RGB = {
-    red: [200, 40, 40],
-    green: [40, 150, 70],
-    blue: [40, 80, 190],
-    black: [25, 25, 25],
-    white: [245, 245, 245],
-    yellow: [230, 200, 50],
-    purple: [130, 50, 170],
-    orange: [230, 120, 40],
-    pink: [230, 110, 160],
-    brown: [130, 80, 45],
-    gray: [140, 140, 140],
-    navy: [20, 40, 90],
-    beige: [210, 190, 160]
-};
 
 class ImageProcessor {
     constructor() {
@@ -24,7 +9,6 @@ class ImageProcessor {
         this.itemsFile = 'items.json';
         this.imagesDir = 'images';
         this.existingItems = this.loadExistingItems();
-        this.removeBackgroundFn = null;
 
         this.folders = {
             inventar: {
@@ -38,6 +22,10 @@ class ImageProcessor {
                 categories: ['outerwear', 'accessories', 'bottoms', 'tops', 'shoes']
             }
         };
+    }
+
+    pythonCmd() {
+        return process.env.PYTHON || 'python';
     }
 
     parseServiceAccountKey(raw) {
@@ -56,18 +44,6 @@ class ImageProcessor {
         }
     }
 
-    imglyDistPath() {
-        const candidates = [
-            path.join(process.cwd(), '.ci-node', 'node_modules', '@imgly', 'background-removal-node', 'dist'),
-            path.join(process.cwd(), 'node_modules', '@imgly', 'background-removal-node', 'dist')
-        ];
-        const found = candidates.find((candidate) => fs.existsSync(candidate));
-        if (!found) {
-            throw new Error('Could not find @imgly/background-removal-node dist folder');
-        }
-        return `file://${found.replace(/\\/g, '/')}/`;
-    }
-
     async init() {
         const credentials = this.parseServiceAccountKey(process.env.GOOGLE_SERVICE_ACCOUNT_KEY);
         if (credentials.client_email) {
@@ -82,18 +58,11 @@ class ImageProcessor {
         this.drive = google.drive({ version: 'v3', auth });
         fs.mkdirSync(this.imagesDir, { recursive: true });
 
-        const imglyEntry = [
-            path.join(process.cwd(), '.ci-node', 'node_modules', '@imgly', 'background-removal-node', 'dist', 'index.cjs'),
-            path.join(process.cwd(), 'node_modules', '@imgly', 'background-removal-node', 'dist', 'index.cjs')
-        ].find((candidate) => fs.existsSync(candidate));
-
-        if (!imglyEntry) {
-            throw new Error('Could not find @imgly/background-removal-node');
+        const check = spawnSync(this.pythonCmd(), ['-c', 'import rembg, PIL; print("rembg ready")'], { encoding: 'utf8' });
+        if (check.status !== 0) {
+            throw new Error(`rembg is not available: ${check.stderr || check.stdout || 'unknown error'}`);
         }
-
-        const imgly = require(imglyEntry);
-        this.removeBackgroundFn = imgly.removeBackground;
-        console.log(`Local background-removal model path: ${this.imglyDistPath()}`);
+        console.log(`Background removal: rembg ${process.env.BG_MODEL || 'birefnet-general'}`);
     }
 
     loadExistingItems() {
@@ -215,74 +184,36 @@ class ImageProcessor {
         });
     }
 
-    async removeBackground(imagePath) {
-        try {
-            const blob = await this.removeBackgroundFn(imagePath, {
-                publicPath: this.imglyDistPath(),
-                model: 'medium',
-                output: {
-                    format: 'image/png',
-                    type: 'foreground'
-                },
-                progress: (key, current, total) => {
-                    if (total) {
-                        console.log(`Downloading ${key}: ${current}/${total}`);
-                    }
-                }
-            });
+    removeBackgrounds(jobs) {
+        const map = new Map();
+        if (jobs.length === 0) return map;
 
-            const processedPath = imagePath.replace(/\.[^/.]+$/, '_processed.png');
-            const buffer = Buffer.from(await blob.arrayBuffer());
-            fs.writeFileSync(processedPath, buffer);
-            console.log(`Removed background locally: ${processedPath}`);
-            return processedPath;
-        } catch (error) {
-            console.error('Local background removal failed:', error.message);
-            return imagePath;
+        const args = ['remove-bg.py'];
+        for (const job of jobs) {
+            args.push(job.input, job.output);
         }
-    }
 
-    nearestPaletteColor(r, g, b) {
-        let bestName = 'gray';
-        let bestDistance = Infinity;
-        for (const [name, [pr, pg, pb]] of Object.entries(PALETTE_RGB)) {
-            const distance = (r - pr) ** 2 + (g - pg) ** 2 + (b - pb) ** 2;
-            if (distance < bestDistance) {
-                bestDistance = distance;
-                bestName = name;
-            }
+        console.log(`Running BiRefNet on ${jobs.length} image${jobs.length === 1 ? '' : 's'}...`);
+        const result = spawnSync(this.pythonCmd(), args, {
+            encoding: 'utf8',
+            stdio: ['ignore', 'pipe', 'inherit'],
+            env: process.env,
+            maxBuffer: 20 * 1024 * 1024
+        });
+
+        if (result.status !== 0) {
+            throw new Error(result.stderr || 'Background removal process failed');
         }
-        return bestName;
-    }
 
-    async analyzeImage(imagePath) {
-        try {
-            const sharp = require('sharp');
-            const { data, info } = await sharp(imagePath).ensureAlpha().resize(64, 64, { fit: 'inside' }).raw().toBuffer({ resolveWithObject: true });
-            const counts = {};
-            let visible = 0;
-
-            for (let i = 0; i < data.length; i += info.channels) {
-                const alpha = info.channels > 3 ? data[i + 3] : 255;
-                if (alpha < 40) continue;
-                visible += 1;
-                const name = this.nearestPaletteColor(data[i], data[i + 1], data[i + 2]);
-                counts[name] = (counts[name] || 0) + 1;
-            }
-
-            const ranked = Object.entries(counts).sort((a, b) => b[1] - a[1]);
-            if (!visible || ranked.length === 0) return [];
-
-            const [topColor, topCount] = ranked[0];
-            const second = ranked[1];
-            if (second && second[1] / visible > 0.22 && topCount / visible < 0.55) {
-                return ['color:colorful'];
-            }
-            return [`color:${topColor}`];
-        } catch (error) {
-            console.warn('Local color analysis skipped:', error.message);
-            return [];
+        const line = (result.stdout || '').split('\n').reverse().find((entry) => entry.startsWith('RESULT '));
+        if (!line) {
+            throw new Error('Background removal did not return results');
         }
+
+        for (const row of JSON.parse(line.slice(7))) {
+            map.set(row.input, row);
+        }
+        return map;
     }
 
     isAlreadyProcessed(image, folderType) {
@@ -302,6 +233,7 @@ class ImageProcessor {
     async processNewImages() {
         try {
             await this.init();
+            const pending = [];
 
             for (const [folderName, folderConfig] of Object.entries(this.folders)) {
                 console.log(`\n=== Processing ${folderName.toUpperCase()} folder ===`);
@@ -313,43 +245,45 @@ class ImageProcessor {
                 console.log(`${newImages.length} new images to process in ${folderName}`);
 
                 for (const image of newImages) {
-                    try {
-                        console.log(`Processing ${folderName} image: ${image.name} (${image.id})`);
-                        const downloadedPath = await this.downloadImage(image.id, image.name);
+                    console.log(`Downloading ${folderName} image: ${image.name} (${image.id})`);
+                    const downloadedPath = await this.downloadImage(image.id, image.name);
+                    const processedPath = downloadedPath.replace(/\.[^/.]+$/, '_processed.png');
+                    pending.push({ image, folderConfig, folderName, downloadedPath, processedPath });
+                }
+            }
 
-                        const processedName = path.basename(downloadedPath).replace(/\.[^/.]+$/, '_processed.png');
-                        const existingProcessedPath = path.join(this.imagesDir, processedName);
+            const cutJobs = pending
+                .filter((job) => !fs.existsSync(job.processedPath))
+                .map((job) => ({ input: job.downloadedPath, output: job.processedPath }));
 
-                        let processedPath;
-                        if (fs.existsSync(existingProcessedPath)) {
-                            processedPath = existingProcessedPath;
-                        } else {
-                            processedPath = await this.removeBackground(downloadedPath);
+            const cutResults = this.removeBackgrounds(cutJobs);
+
+            for (const job of pending) {
+                try {
+                    const cut = cutResults.get(job.downloadedPath);
+                    const processedPath = fs.existsSync(job.processedPath) ? job.processedPath : job.downloadedPath;
+                    const autoTags = cut?.ok ? (cut.tags || []) : [];
+
+                    this.existingItems.push({
+                        id: new Date().toISOString(),
+                        driveFileId: job.image.id,
+                        sourceName: job.image.name,
+                        imageUrl: `images/${path.basename(processedPath)}`,
+                        folderType: job.folderConfig.type,
+                        category: job.image.category,
+                        tags: {
+                            auto: autoTags,
+                            manual: []
                         }
+                    });
 
-                        const autoTags = await this.analyzeImage(processedPath);
-
-                        this.existingItems.push({
-                            id: new Date().toISOString(),
-                            driveFileId: image.id,
-                            sourceName: image.name,
-                            imageUrl: `images/${path.basename(processedPath)}`,
-                            folderType: folderConfig.type,
-                            category: image.category,
-                            tags: {
-                                auto: autoTags,
-                                manual: []
-                            }
-                        });
-
-                        if (downloadedPath !== processedPath && fs.existsSync(downloadedPath)) {
-                            fs.unlinkSync(downloadedPath);
-                        }
-
-                        console.log(`Added ${folderName} item from ${image.name}`);
-                    } catch (error) {
-                        console.error(`Error processing ${folderName} image ${image.name}:`, error.message);
+                    if (processedPath !== job.downloadedPath && fs.existsSync(job.downloadedPath)) {
+                        fs.unlinkSync(job.downloadedPath);
                     }
+
+                    console.log(`Added ${job.folderName} item from ${job.image.name}`);
+                } catch (error) {
+                    console.error(`Error finishing ${job.image.name}:`, error.message);
                 }
             }
 

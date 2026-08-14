@@ -16,7 +16,7 @@ Open http://localhost:8000
 
 Share both Google Drive folders with the service account email.
 
-Background removal and color tagging run locally in GitHub Actions. No remove.bg or Imagga keys are needed.
+Background removal uses rembg with BiRefNet in GitHub Actions. The first processing run downloads a large model and later runs reuse the cache. No remove.bg or Imagga keys are needed.
 
 ## Admin tags
 

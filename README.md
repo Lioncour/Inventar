@@ -42,6 +42,6 @@ Admin saves tags in this browser immediately. Use **Download items.json** and co
 ## Notes
 
 - Filters only match items that actually have those tags. New items get a rough color tag from the processed photo; room/size/price tags are added in admin.
-- Background removal runs locally in GitHub Actions with `@imgly/background-removal-node`. There is no per-image API cost.
+- Background removal runs locally in GitHub Actions with rembg and the BiRefNet general model. There is no per-image API cost. First run downloads a large model and is cached afterwards.
 - The workflow no longer runs on every `items.json` push, so processing commits cannot retrigger themselves.
 - Runtime packages are installed into `.ci-node` for the job only.

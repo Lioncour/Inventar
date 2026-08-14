@@ -71,5 +71,4 @@ service-account-key.json
 google-credentials.json
 
 # Local development
-local/
-dev/
+.u2net-models/

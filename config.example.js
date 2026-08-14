@@ -24,7 +24,8 @@ const config = {
         maxFileSize: 10 * 1024 * 1024, // 10MB
         allowedFormats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
         backgroundRemoval: {
-            engine: 'local', // @imgly/background-removal-node in GitHub Actions
+            engine: 'rembg',
+            model: 'birefnet-general',
             format: 'png'
         }
     },
