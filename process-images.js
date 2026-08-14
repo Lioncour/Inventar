@@ -82,7 +82,16 @@ class ImageProcessor {
         this.drive = google.drive({ version: 'v3', auth });
         fs.mkdirSync(this.imagesDir, { recursive: true });
 
-        const imgly = await import('@imgly/background-removal-node');
+        const imglyEntry = [
+            path.join(process.cwd(), '.ci-node', 'node_modules', '@imgly', 'background-removal-node', 'dist', 'index.cjs'),
+            path.join(process.cwd(), 'node_modules', '@imgly', 'background-removal-node', 'dist', 'index.cjs')
+        ].find((candidate) => fs.existsSync(candidate));
+
+        if (!imglyEntry) {
+            throw new Error('Could not find @imgly/background-removal-node');
+        }
+
+        const imgly = require(imglyEntry);
         this.removeBackgroundFn = imgly.removeBackground;
         console.log(`Local background-removal model path: ${this.imglyDistPath()}`);
     }
