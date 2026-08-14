@@ -205,6 +205,18 @@
         .filter-pill.clear-btn:hover {
             background: #ff3742;
         }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
         
         /* Minimalist Header */
         header {
@@ -397,7 +409,7 @@
                     <a href="33plus7.html" class="text-gray-600 hover:text-gray-900 transition-colors font-medium">
                         33+7
                     </a>
-                    <button id="aboutBtn" class="text-gray-600 hover:text-gray-900 transition-colors font-medium">
+                    <button id="aboutBtn" type="button" class="text-gray-600 hover:text-gray-900 transition-colors font-medium">
                         About
                     </button>
                 </div>
@@ -409,40 +421,45 @@
     <main class="pt-24 px-4 sm:px-6 lg:px-8 pb-8">
         <!-- Always Visible Filters -->
         <div class="mb-6">
+            <div class="flex flex-wrap gap-3 items-center mb-3">
+                <label for="searchInput" class="sr-only">Search items</label>
+                <input
+                    id="searchInput"
+                    type="search"
+                    placeholder="Search items..."
+                    class="w-full sm:w-72 px-3 py-2 text-sm border border-gray-200 rounded-md"
+                >
+            </div>
             <div class="flex flex-wrap gap-3 items-center">
                 <span class="text-sm text-gray-600 font-medium">Filter by:</span>
                 <div class="flex flex-wrap gap-2">
-                    <!-- Color Filters -->
-                    <button class="filter-pill" data-type="color" data-value="red">Red</button>
-                    <button class="filter-pill" data-type="color" data-value="green">Green</button>
-                    <button class="filter-pill" data-type="color" data-value="blue">Blue</button>
-                    <button class="filter-pill" data-type="color" data-value="black">Black</button>
-                    <button class="filter-pill" data-type="color" data-value="white">White</button>
-                    <button class="filter-pill" data-type="color" data-value="yellow">Yellow</button>
-                    <button class="filter-pill" data-type="color" data-value="colorful">Colorful</button>
+                    <button class="filter-pill" data-type="color" data-value="red" aria-pressed="false">Red</button>
+                    <button class="filter-pill" data-type="color" data-value="green" aria-pressed="false">Green</button>
+                    <button class="filter-pill" data-type="color" data-value="blue" aria-pressed="false">Blue</button>
+                    <button class="filter-pill" data-type="color" data-value="black" aria-pressed="false">Black</button>
+                    <button class="filter-pill" data-type="color" data-value="white" aria-pressed="false">White</button>
+                    <button class="filter-pill" data-type="color" data-value="yellow" aria-pressed="false">Yellow</button>
+                    <button class="filter-pill" data-type="color" data-value="colorful" aria-pressed="false">Colorful</button>
                 </div>
                 <div class="flex flex-wrap gap-2 ml-4">
-                    <!-- Size Filters -->
-                    <button class="filter-pill" data-type="size" data-value="tiny">Tiny</button>
-                    <button class="filter-pill" data-type="size" data-value="small">Small</button>
-                    <button class="filter-pill" data-type="size" data-value="medium">Medium</button>
-                    <button class="filter-pill" data-type="size" data-value="large">Large</button>
+                    <button class="filter-pill" data-type="size" data-value="tiny" aria-pressed="false">Tiny</button>
+                    <button class="filter-pill" data-type="size" data-value="small" aria-pressed="false">Small</button>
+                    <button class="filter-pill" data-type="size" data-value="medium" aria-pressed="false">Medium</button>
+                    <button class="filter-pill" data-type="size" data-value="large" aria-pressed="false">Large</button>
                 </div>
                 <div class="flex flex-wrap gap-2 ml-4">
-                    <!-- Room Filters -->
-                    <button class="filter-pill" data-type="room" data-value="bedroom">Bedroom</button>
-                    <button class="filter-pill" data-type="room" data-value="livingroom">Living Room</button>
-                    <button class="filter-pill" data-type="room" data-value="kitchen">Kitchen</button>
-                    <button class="filter-pill" data-type="room" data-value="garage">Garage</button>
-                    <button class="filter-pill" data-type="room" data-value="outdoor">Outdoor</button>
+                    <button class="filter-pill" data-type="room" data-value="bedroom" aria-pressed="false">Bedroom</button>
+                    <button class="filter-pill" data-type="room" data-value="livingroom" aria-pressed="false">Living Room</button>
+                    <button class="filter-pill" data-type="room" data-value="kitchen" aria-pressed="false">Kitchen</button>
+                    <button class="filter-pill" data-type="room" data-value="garage" aria-pressed="false">Garage</button>
+                    <button class="filter-pill" data-type="room" data-value="outdoor" aria-pressed="false">Outdoor</button>
                 </div>
                 <div class="flex flex-wrap gap-2 ml-4">
-                    <!-- Price Filters -->
-                    <button class="filter-pill" data-type="price" data-value="cheap">Cheap</button>
-                    <button class="filter-pill" data-type="price" data-value="not cheap">Not Cheap</button>
-                    <button class="filter-pill" data-type="price" data-value="expensive">Expensive</button>
+                    <button class="filter-pill" data-type="price" data-value="cheap" aria-pressed="false">Cheap</button>
+                    <button class="filter-pill" data-type="price" data-value="not cheap" aria-pressed="false">Not Cheap</button>
+                    <button class="filter-pill" data-type="price" data-value="expensive" aria-pressed="false">Expensive</button>
                 </div>
-                <button id="clearAllFilters" class="filter-pill clear-btn">Clear All</button>
+                <button id="clearAllFilters" class="filter-pill clear-btn" type="button">Clear All</button>
             </div>
         </div>
 
@@ -473,74 +490,6 @@
             <span class="close">&times;</span>
             <div id="modalContent">
                 <!-- Modal content will be dynamically loaded here -->
-            </div>
-        </div>
-    </div>
-
-    <!-- Filter Modal -->
-    <div id="filterModal" class="modal">
-        <div class="modal-content max-w-2xl">
-            <span class="close" id="filterClose">&times;</span>
-            <div class="p-6">
-                <h2 class="text-2xl font-bold text-gray-900 mb-6">Filter Items</h2>
-                
-                <div class="space-y-6">
-                    <!-- Color Filter -->
-                    <div>
-                        <h3 class="text-lg font-semibold text-gray-800 mb-3">Color</h3>
-                        <div class="flex flex-wrap gap-2">
-                            <button class="filter-option" data-type="color" data-value="red">Red</button>
-                            <button class="filter-option" data-type="color" data-value="green">Green</button>
-                            <button class="filter-option" data-type="color" data-value="blue">Blue</button>
-                            <button class="filter-option" data-type="color" data-value="black">Black</button>
-                            <button class="filter-option" data-type="color" data-value="white">White</button>
-                            <button class="filter-option" data-type="color" data-value="yellow">Yellow</button>
-                            <button class="filter-option" data-type="color" data-value="colorful">Colorful</button>
-                        </div>
-                    </div>
-
-                    <!-- Size Filter -->
-                    <div>
-                        <h3 class="text-lg font-semibold text-gray-800 mb-3">Size</h3>
-                        <div class="flex flex-wrap gap-2">
-                            <button class="filter-option" data-type="size" data-value="tiny">Tiny</button>
-                            <button class="filter-option" data-type="size" data-value="small">Small</button>
-                            <button class="filter-option" data-type="size" data-value="medium">Medium</button>
-                            <button class="filter-option" data-type="size" data-value="large">Large</button>
-                        </div>
-                    </div>
-
-                    <!-- Room Filter -->
-                    <div>
-                        <h3 class="text-lg font-semibold text-gray-800 mb-3">Room</h3>
-                        <div class="flex flex-wrap gap-2">
-                            <button class="filter-option" data-type="room" data-value="bedroom">Bedroom</button>
-                            <button class="filter-option" data-type="room" data-value="livingroom">Living Room</button>
-                            <button class="filter-option" data-type="room" data-value="kitchen">Kitchen</button>
-                            <button class="filter-option" data-type="room" data-value="garage">Garage</button>
-                            <button class="filter-option" data-type="room" data-value="outdoor">Outdoor</button>
-                        </div>
-                    </div>
-
-                    <!-- Price Range Filter -->
-                    <div>
-                        <h3 class="text-lg font-semibold text-gray-800 mb-3">Price Range</h3>
-                        <div class="flex flex-wrap gap-2">
-                            <button class="filter-option" data-type="price" data-value="cheap">Cheap</button>
-                            <button class="filter-option" data-type="price" data-value="not cheap">Not Cheap</button>
-                            <button class="filter-option" data-type="price" data-value="expensive">Expensive</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex justify-end space-x-3 mt-6">
-                    <button id="clearAllFilters" class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors">
-                        Clear All
-                    </button>
-                    <button id="applyFilters" class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                        Apply Filters
-                    </button>
-                </div>
             </div>
         </div>
     </div>
@@ -577,7 +526,7 @@
                             <li>GitHub Actions automatically processes new images every hour</li>
                             <li>Backgrounds are removed and AI tags are generated</li>
                             <li>Items appear in your inventory with automatic updates</li>
-                            <li>Use the admin panel to add custom tags and organize your items</li>
+                            <li>Use the admin panel to add custom tags. Tags are saved in this browser and can be downloaded as items.json to commit.</li>
                         </ol>
                     </div>
                     

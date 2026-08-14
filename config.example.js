@@ -9,8 +9,8 @@ const config = {
             serviceAccountKey: 'YOUR_SERVICE_ACCOUNT_JSON_KEY' // JSON as string
         },
         '33plus7': {
-            folderId: 'YOUR_33PLUS7_FOLDER_ID', // Your 33+7 folder ID
-            serviceAccountKey: 'YOUR_SERVICE_ACCOUNT_JSON_KEY' // Same service account
+            folderId: 'YOUR_33PLUS7_FOLDER_ID', // Or set CLOTHING_FOLDER_ID in GitHub Actions
+            serviceAccountKey: 'YOUR_SERVICE_ACCOUNT_JSON_KEY'
         }
     },
     

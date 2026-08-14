@@ -415,7 +415,11 @@
                 <div class="nav-label">
                     33+7
                 </div>
-                <button class="about-button" onclick="openAboutModal()">About</button>
+                <div class="flex items-center gap-6">
+                    <span id="pieceCount" class="text-sm" style="color:#666666;"></span>
+                    <a href="index.html" class="nav-link">Inventar</a>
+                    <button class="about-button" type="button" onclick="openAboutModal()">About</button>
+                </div>
             </div>
         </div>
     </nav>
@@ -472,23 +476,62 @@
             <p>This system promotes sustainable fashion, reduces waste, and helps you build a wardrobe that truly reflects your personal style.</p>
             
             <div class="links">
-                <p><strong>Visit my website:</strong> <a href="https://janandersekroll.no" target="_blank">janandersekroll.no</a></p>
+                <p><strong>Visit my website:</strong> <a href="https://janandersekroll.no" target="_blank" rel="noopener noreferrer">janandersekroll.no</a></p>
             </div>
         </div>
     </div>
 
     <script>
+        const TAG_OVERRIDES_KEY = 'inventar_tag_overrides';
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function loadTagOverrides() {
+            try {
+                return JSON.parse(localStorage.getItem(TAG_OVERRIDES_KEY) || '{}');
+            } catch {
+                return {};
+            }
+        }
+
+        function applyTagOverrides(items) {
+            const overrides = loadTagOverrides();
+            return items.map((item) => {
+                const override = overrides[item.id];
+                if (!override) return item;
+                return {
+                    ...item,
+                    tags: {
+                        auto: item.tags?.auto || [],
+                        manual: Array.isArray(override.manual) ? override.manual : (item.tags?.manual || [])
+                    }
+                };
+            });
+        }
+
+        function displayName(item) {
+            if (item.name) return item.name;
+            const fileName = (item.sourceName || item.imageUrl || '').split('/').pop() || 'Item';
+            return fileName.replace(/_processed/g, '').replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ');
+        }
+
         class CapsuleWardrobe {
             constructor() {
                 this.categories = {
-                    'outerwear': [],
-                    'accessories': [],
-                    'bottoms': [],
-                    'tops': [],
-                    'shoes': []
+                    outerwear: [],
+                    accessories: [],
+                    bottoms: [],
+                    tops: [],
+                    shoes: []
                 };
                 this.allItems = [];
-                
                 this.init();
             }
 
@@ -501,87 +544,34 @@
             async loadItems() {
                 try {
                     this.showLoading(true);
-                    
-                    // Load real data from items.json
-                    const response = await fetch('items.json');
+                    const response = await fetch('items.json', { cache: 'no-store' });
                     if (!response.ok) {
                         throw new Error('Failed to load items.json');
                     }
-                    
+
                     const allItems = await response.json();
-                    
-                    // Filter for clothing items only
-                    this.allItems = allItems.filter(item => 
-                        item.folderType === 'clothing' || 
-                        (item.category && ['outerwear', 'accessories', 'bottoms', 'tops', 'shoes'].includes(item.category))
-                    );
-                    
-                    // If no real data, fall back to dummy data
-                    if (this.allItems.length === 0) {
-                        console.log('No clothing items found, using dummy data for testing');
-                        this.allItems = this.generateDummyClothing();
-                    }
-                    
+                    this.allItems = applyTagOverrides(allItems.filter((item) => item.folderType === 'clothing'));
                     this.showLoading(false);
                 } catch (error) {
                     console.error('Error loading items:', error);
-                    console.log('Falling back to dummy data');
-                    this.allItems = this.generateDummyClothing();
+                    this.allItems = [];
                     this.showLoading(false);
+                    this.showError('Failed to load clothing items.');
                 }
-            }
-
-            generateDummyClothing() {
-                const clothingTypes = {
-                    'outerwear': ['Jacket', 'Coat', 'Blazer', 'Cardigan', 'Hoodie', 'Vest', 'Trench Coat'],
-                    'accessories': ['Scarf', 'Hat', 'Belt', 'Bag', 'Watch', 'Necklace', 'Bracelet', 'Sunglasses'],
-                    'bottoms': ['Jeans', 'Trousers', 'Shorts', 'Skirt', 'Leggings', 'Chinos', 'Culottes'],
-                    'tops': ['T-Shirt', 'Blouse', 'Sweater', 'Tank Top', 'Polo', 'Tunic', 'Crop Top'],
-                    'shoes': ['Sneakers', 'Boots', 'Heels', 'Flats', 'Sandals', 'Loafers', 'Ankle Boots']
-                };
-
-                const colors = ['Black', 'White', 'Navy', 'Gray', 'Beige', 'Brown', 'Red', 'Blue'];
-                const items = [];
-
-                Object.entries(clothingTypes).forEach(([category, types]) => {
-                    const itemCount = Math.floor(Math.random() * 8) + 3; // 3-10 items per category
-                    
-                    for (let i = 0; i < itemCount; i++) {
-                        const type = types[Math.floor(Math.random() * types.length)];
-                        const color = colors[Math.floor(Math.random() * colors.length)];
-                        
-                        items.push({
-                            id: `${category}-${i}`,
-                            name: `${color} ${type}`,
-                            category: category,
-                            imageUrl: `https://via.placeholder.com/200x200/000000/ffffff?text=${encodeURIComponent(type)}`,
-                            color: color.toLowerCase(),
-                            type: type.toLowerCase()
-                        });
-                    }
-                });
-
-                return items;
             }
 
             categorizeItems() {
                 this.categories = {
-                    'outerwear': [],
-                    'accessories': [],
-                    'bottoms': [],
-                    'tops': [],
-                    'shoes': []
+                    outerwear: [],
+                    accessories: [],
+                    bottoms: [],
+                    tops: [],
+                    shoes: []
                 };
 
-                this.allItems.forEach(item => {
-                    // Use the category from the item, or fallback to 'tops' for unknown categories
-                    const category = item.category || 'tops';
-                    if (this.categories[category]) {
-                        this.categories[category].push(item);
-                    } else {
-                        // Fallback to tops for unknown categories
-                        this.categories['tops'].push(item);
-                    }
+                this.allItems.forEach((item) => {
+                    const category = this.categories[item.category] ? item.category : 'tops';
+                    this.categories[category].push(item);
                 });
             }
 
@@ -589,211 +579,145 @@
                 const container = document.getElementById('categoriesContainer');
                 container.innerHTML = '';
 
+                const pieceCount = document.getElementById('pieceCount');
+                pieceCount.textContent = `${this.allItems.length} / 40 pieces`;
+
+                if (this.allItems.length === 0) {
+                    this.showEmptyState(true);
+                    return;
+                }
+
                 Object.entries(this.categories).forEach(([categoryKey, items]) => {
+                    if (items.length === 0) return;
                     const categoryName = categoryKey.charAt(0).toUpperCase() + categoryKey.slice(1);
-                    const categorySection = this.createCategorySection(categoryName, items);
-                    container.appendChild(categorySection);
+                    container.appendChild(this.createCategorySection(categoryName, items));
                 });
 
+                this.showEmptyState(false);
                 container.style.display = 'block';
             }
 
             createCategorySection(categoryName, items) {
                 const section = document.createElement('div');
                 section.className = 'category-section';
-                
+
                 const grid = document.createElement('div');
                 grid.className = 'category-grid';
-                
+
                 const title = document.createElement('div');
                 title.className = 'category-title';
-                title.textContent = categoryName;
-                
+                title.textContent = `${categoryName} (${items.length})`;
+
                 const itemsContainer = document.createElement('div');
                 itemsContainer.className = 'items-container';
-                
-                if (items.length === 0) {
-                    const emptyDiv = document.createElement('div');
-                    emptyDiv.className = 'empty-category';
-                    emptyDiv.textContent = 'No items in this category';
-                    itemsContainer.appendChild(emptyDiv);
-                } else {
-                    items.forEach(item => {
-                        const itemDiv = this.createClothingItem(item);
-                        itemsContainer.appendChild(itemDiv);
-                    });
-                    
-                    // Add scroll hint if there are many items
-                    if (items.length > 4) {
-                        const scrollHint = document.createElement('div');
-                        scrollHint.className = 'scroll-hint';
-                        scrollHint.innerHTML = '<i class="fas fa-chevron-right"></i>';
-                        section.appendChild(scrollHint);
-                    }
-                }
-                
+
+                items.forEach((item) => {
+                    itemsContainer.appendChild(this.createClothingItem(item));
+                });
+
                 grid.appendChild(title);
                 grid.appendChild(itemsContainer);
                 section.appendChild(grid);
-                
                 return section;
             }
 
             createClothingItem(item) {
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'clothing-item';
-                
-                // Use real image URL or fallback to placeholder
-                const imageUrl = item.imageUrl || 'https://via.placeholder.com/200x200/333333/ffffff?text=IMAGE+NOT+FOUND';
-                const itemName = item.name || item.id || 'Unknown Item';
-                
+                const name = displayName(item);
+
                 itemDiv.innerHTML = `
-                    <img 
-                        src="${imageUrl}" 
-                        alt="${itemName}"
-                        onerror="this.src='https://via.placeholder.com/200x200/333333/ffffff?text=IMAGE+NOT+FOUND'"
+                    <img
+                        src="${escapeHtml(item.imageUrl)}"
+                        alt="${escapeHtml(name)}"
+                        onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5YTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIG5vdCBmb3VuZDwvdGV4dD48L3N2Zz4='"
                     >
                 `;
-                
-                itemDiv.addEventListener('click', () => {
-                    this.showItemDetails(item);
-                });
-                
-                return itemDiv;
-            }
 
-            showItemDetails(item) {
-                this.openItemModal(item);
+                itemDiv.addEventListener('click', () => this.openItemModal(item));
+                return itemDiv;
             }
 
             openItemModal(item) {
                 const modal = document.getElementById('itemModal');
                 const modalContent = document.getElementById('modalContent');
-                
+                const name = displayName(item);
                 const autoTags = item.tags?.auto || [];
                 const manualTags = item.tags?.manual || [];
                 const allTags = [...autoTags, ...manualTags];
-                
-                const itemName = item.name || item.id || 'Unknown Item';
-                const category = item.category || 'Unknown';
-                const price = item.price || 'Not specified';
-                
+
                 modalContent.innerHTML = `
                     <div style="padding: 20px;">
                         <div style="margin-bottom: 20px;">
-                            <img 
-                                src="${item.imageUrl}" 
-                                alt="${itemName}"
+                            <img
+                                src="${escapeHtml(item.imageUrl)}"
+                                alt="${escapeHtml(name)}"
                                 style="width: 100%; max-width: 1000px; max-height: 70vh; height: auto; object-fit: contain; border-radius: 8px; margin-bottom: 16px;"
                             >
                         </div>
                         <h2 style="font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; margin-bottom: 16px; color: #1a1a1a;">
-                            ${itemName}
+                            ${escapeHtml(name)}
                         </h2>
+                        ${allTags.length > 0 ? `
+                            <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                                ${allTags.map((tag) => `<span class="tag" style="background:#f5f5f5;padding:4px 8px;font-size:12px;">${escapeHtml(tag)}</span>`).join('')}
+                            </div>
+                        ` : ''}
                     </div>
                 `;
-                
+
                 modal.style.display = 'block';
                 document.body.style.overflow = 'hidden';
             }
 
-            closeItemModal() {
-                const modal = document.getElementById('itemModal');
-                modal.style.display = 'none';
-                document.body.style.overflow = 'auto';
-            }
-
             showLoading(show) {
-                const loadingState = document.getElementById('loadingState');
-                const categoriesContainer = document.getElementById('categoriesContainer');
-                
-                if (show) {
-                    loadingState.style.display = 'flex';
-                    categoriesContainer.style.display = 'none';
-                } else {
-                    loadingState.style.display = 'none';
-                    categoriesContainer.style.display = 'block';
-                }
+                document.getElementById('loadingState').style.display = show ? 'flex' : 'none';
+                document.getElementById('categoriesContainer').style.display = show ? 'none' : 'block';
+                if (show) document.getElementById('emptyState').style.display = 'none';
             }
 
             showEmptyState(show) {
-                const emptyState = document.getElementById('emptyState');
-                const categoriesContainer = document.getElementById('categoriesContainer');
-                
-                if (show) {
-                    emptyState.style.display = 'block';
-                    categoriesContainer.style.display = 'none';
-                } else {
-                    emptyState.style.display = 'none';
-                    categoriesContainer.style.display = 'block';
-                }
+                document.getElementById('emptyState').style.display = show ? 'block' : 'none';
+                document.getElementById('categoriesContainer').style.display = show ? 'none' : 'block';
             }
 
             showError(message) {
                 const errorDiv = document.createElement('div');
                 errorDiv.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
-                errorDiv.innerHTML = `
-                    <div class="flex items-center">
-                        <i class="fas fa-exclamation-triangle mr-2"></i>
-                        <span>${message}</span>
-                        <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                `;
-                
+                errorDiv.textContent = message;
                 document.body.appendChild(errorDiv);
-                
-                setTimeout(() => {
-                    if (errorDiv.parentElement) {
-                        errorDiv.remove();
-                    }
-                }, 5000);
+                setTimeout(() => errorDiv.remove(), 5000);
             }
         }
 
-        // Initialize the capsule wardrobe
-        // Modal functions
         function openAboutModal() {
             document.getElementById('aboutModal').style.display = 'block';
-        }
-        
-        function closeAboutModal() {
-            document.getElementById('aboutModal').style.display = 'none';
+            document.body.style.overflow = 'hidden';
         }
 
-        function closeItemModal() {
-            document.getElementById('itemModal').style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
-        
-        // Close modal when clicking outside of it
-        window.onclick = function(event) {
-            const aboutModal = document.getElementById('aboutModal');
-            const itemModal = document.getElementById('itemModal');
-            
-            if (event.target == aboutModal) {
-                aboutModal.style.display = 'none';
-            }
-            if (event.target == itemModal) {
-                itemModal.style.display = 'none';
+        function closeAboutModal() {
+            document.getElementById('aboutModal').style.display = 'none';
+            if (document.getElementById('itemModal').style.display !== 'block') {
                 document.body.style.overflow = 'auto';
             }
         }
 
-        // Close modals with Escape key
+        function closeItemModal() {
+            document.getElementById('itemModal').style.display = 'none';
+            if (document.getElementById('aboutModal').style.display !== 'block') {
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        window.onclick = function(event) {
+            if (event.target.id === 'aboutModal') closeAboutModal();
+            if (event.target.id === 'itemModal') closeItemModal();
+        };
+
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape') {
-                const aboutModal = document.getElementById('aboutModal');
-                const itemModal = document.getElementById('itemModal');
-                
-                if (aboutModal.style.display === 'block') {
-                    aboutModal.style.display = 'none';
-                }
-                if (itemModal.style.display === 'block') {
-                    itemModal.style.display = 'none';
-                    document.body.style.overflow = 'auto';
-                }
+                closeAboutModal();
+                closeItemModal();
             }
         });
 

@@ -2,28 +2,22 @@ name: Process New Images
 
 on:
   schedule:
-    # Run every hour
     - cron: '0 * * * *'
   workflow_dispatch:
-    # Allow manual triggering
-  push:
-    paths:
-      - 'items.json'
 
 permissions:
   contents: write
 
 concurrency:
-  group: process-images-${{ github.ref }}
+  group: process-images
   cancel-in-progress: true
 
 jobs:
   process-images:
     runs-on: ubuntu-latest
     env:
-      # Opt in early to the upcoming Actions runtime default.
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-    
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v5
@@ -36,13 +30,9 @@ jobs:
       uses: actions/setup-node@v5
       with:
         node-version: '22'
-        cache: npm
 
     - name: Install dependencies
       run: npm install --prefix .ci-node --no-save --no-package-lock --no-audit --no-fund googleapis axios form-data
-
-    - name: Create images directory
-      run: mkdir -p images
 
     - name: Process new images
       env:
@@ -56,13 +46,13 @@ jobs:
 
     - name: Commit changes
       run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
+        git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
         git add items.json images
         if git diff --staged --quiet; then
           echo "No changes to commit"
-        else
-          git commit -m "Auto-update: Process new images from Google Drive"
-          git pull --rebase origin "${GITHUB_REF_NAME}" || true
-          git push origin "HEAD:${GITHUB_REF_NAME}"
+          exit 0
         fi
+        git commit -m "Auto-update: Process new images from Google Drive"
+        git pull --rebase origin "${GITHUB_REF_NAME}"
+        git push origin "HEAD:${GITHUB_REF_NAME}"

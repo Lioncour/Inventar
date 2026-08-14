@@ -1,110 +1,111 @@
+const TAG_OVERRIDES_KEY = 'inventar_tag_overrides';
+
+function escapeHtml(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function loadTagOverrides() {
+    try {
+        return JSON.parse(localStorage.getItem(TAG_OVERRIDES_KEY) || '{}');
+    } catch {
+        return {};
+    }
+}
+
+function applyTagOverrides(items) {
+    const overrides = loadTagOverrides();
+    return items.map((item) => {
+        const override = overrides[item.id];
+        if (!override) return item;
+        return {
+            ...item,
+            tags: {
+                auto: item.tags?.auto || [],
+                manual: Array.isArray(override.manual) ? override.manual : (item.tags?.manual || [])
+            }
+        };
+    });
+}
+
 class InventarApp {
     constructor() {
         this.items = [];
         this.filteredItems = [];
-        this.currentPage = 0;
-        this.itemsPerPage = 20;
-        this.isLoading = false;
-        this.hasMoreItems = true;
+        this.searchQuery = '';
         this.activeFilters = {
             color: [],
             size: [],
             room: [],
             price: []
         };
-        
+
         this.init();
     }
 
     async init() {
         this.setupEventListeners();
         await this.loadItems();
-        this.setupInfiniteScroll();
-        this.resetGridContainerStyles();
     }
 
     setupEventListeners() {
-        // Filter pill clicks
         document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('filter-pill')) {
-                if (e.target.id === 'clearAllFilters') {
-                    this.clearAllFilters();
-                } else {
-                    this.toggleFilterPill(e.target);
-                }
+            const pill = e.target.closest('.filter-pill');
+            if (!pill) return;
+
+            if (pill.id === 'clearAllFilters') {
+                this.clearAllFilters();
+            } else {
+                this.toggleFilterPill(pill);
             }
         });
 
-        // About modal
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                this.searchQuery = e.target.value.trim().toLowerCase();
+                this.filterItems();
+            });
+        }
+
         document.getElementById('aboutBtn').addEventListener('click', () => {
             this.openAboutModal();
         });
 
-        // Modal close events
-        const itemModal = document.getElementById('itemModal');
-        const aboutModal = document.getElementById('aboutModal');
-        const filterModal = document.getElementById('filterModal');
-        const closeBtns = document.querySelectorAll('.close');
-        
-        closeBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                this.closeModal();
-                this.closeAboutModal();
-                this.closeFilterModal();
-            });
+        document.querySelectorAll('.close').forEach((btn) => {
+            btn.addEventListener('click', () => this.closeAllModals());
         });
 
-        itemModal.addEventListener('click', (e) => {
-            if (e.target === itemModal) {
-                this.closeModal();
-            }
+        document.getElementById('itemModal').addEventListener('click', (e) => {
+            if (e.target.id === 'itemModal') this.closeModal();
         });
 
-        aboutModal.addEventListener('click', (e) => {
-            if (e.target === aboutModal) {
-                this.closeAboutModal();
-            }
+        document.getElementById('aboutModal').addEventListener('click', (e) => {
+            if (e.target.id === 'aboutModal') this.closeAboutModal();
         });
 
-        filterModal.addEventListener('click', (e) => {
-            if (e.target === filterModal) {
-                this.closeFilterModal();
-            }
-        });
-
-        // Escape key to close modals
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                this.closeModal();
-                this.closeAboutModal();
-                this.closeFilterModal();
-            }
+            if (e.key === 'Escape') this.closeAllModals();
         });
     }
 
     async loadItems() {
         try {
             this.showLoading(true);
-            const response = await fetch('items.json');
-            
+            const response = await fetch('items.json', { cache: 'no-store' });
+
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            
+
             const allItems = await response.json();
-            // Filter to only show inventar items, not clothing items
-            this.items = allItems.filter(item => item.folderType === 'inventar');
-            this.filteredItems = [...this.items];
-            this.currentPage = 0;
-            this.hasMoreItems = this.items.length > 0;
-            
-            this.updateItemCount();
+            this.items = applyTagOverrides(allItems.filter((item) => item.folderType === 'inventar'));
             this.filterItems();
             this.showLoading(false);
-            
-            if (this.items.length === 0) {
-                this.showEmptyState(true);
-            }
         } catch (error) {
             console.error('Error loading items:', error);
             this.showError('Failed to load inventory. Please try again.');
@@ -112,35 +113,27 @@ class InventarApp {
         }
     }
 
-    async refreshItems() {
-        this.items = [];
-        this.filteredItems = [];
-        this.currentPage = 0;
-        this.hasMoreItems = true;
-        document.getElementById('gridContainer').innerHTML = '';
-        await this.loadItems();
+    getTagValue(item, tagType) {
+        const allTags = [...(item.tags?.auto || []), ...(item.tags?.manual || [])];
+        const tag = allTags.find((t) => t.toLowerCase().startsWith(`${tagType.toLowerCase()}:`));
+        return tag ? tag.split(':').slice(1).join(':').trim().toLowerCase() : null;
     }
 
-    getTagValue(item, tagType) {
-        const allTags = [...(item.tags.auto || []), ...(item.tags.manual || [])];
-        const tag = allTags.find(t => t.toLowerCase().startsWith(tagType.toLowerCase() + ':'));
-        return tag ? tag.split(':')[1] : null;
+    itemSearchText(item) {
+        const tags = [...(item.tags?.auto || []), ...(item.tags?.manual || [])].join(' ');
+        return `${item.imageUrl || ''} ${item.sourceName || ''} ${item.category || ''} ${tags}`.toLowerCase();
     }
 
     renderItems() {
         const gridContainer = document.getElementById('gridContainer');
-        gridContainer.innerHTML = ''; // Clear existing items
-        
-        const startIndex = this.currentPage * this.itemsPerPage;
-        const endIndex = Math.min(startIndex + this.itemsPerPage, this.filteredItems.length);
-        
-        for (let i = startIndex; i < endIndex; i++) {
-            const item = this.filteredItems[i];
-            this.createGridItem(item, gridContainer);
-        }
-        
-        this.currentPage++;
-        this.hasMoreItems = endIndex < this.filteredItems.length;
+        gridContainer.innerHTML = '';
+
+        this.filteredItems.forEach((item) => this.createGridItem(item, gridContainer));
+        this.updateItemCount();
+
+        const hasItems = this.items.length > 0;
+        const hasMatches = this.filteredItems.length > 0;
+        this.showEmptyState(!hasMatches, hasItems);
     }
 
     createGridItem(item, container) {
@@ -148,407 +141,214 @@ class InventarApp {
         itemDiv.className = 'grid-item cursor-pointer group';
         itemDiv.innerHTML = `
             <div class="aspect-square overflow-hidden">
-                <img 
-                    src="${item.imageUrl}" 
-                    alt="Item ${item.id}"
+                <img
+                    src="${escapeHtml(item.imageUrl)}"
+                    alt="${escapeHtml(this.displayName(item))}"
                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                     loading="lazy"
                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5YTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIG5vdCBmb3VuZDwvdGV4dD48L3N2Zz4='"
                 >
             </div>
         `;
-        
-        itemDiv.addEventListener('click', () => {
-            this.openModal(item);
-        });
-        
+
+        itemDiv.addEventListener('click', () => this.openModal(item));
         container.appendChild(itemDiv);
+    }
+
+    displayName(item) {
+        if (item.name) return item.name;
+        const fileName = (item.sourceName || item.imageUrl || '').split('/').pop() || 'Item';
+        return fileName.replace(/_processed/g, '').replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ');
     }
 
     openModal(item) {
         const modal = document.getElementById('itemModal');
         const modalContent = document.getElementById('modalContent');
-        
-        const allTags = [...(item.tags.auto || []), ...(item.tags.manual || [])];
-        
+        const autoTags = item.tags?.auto || [];
+        const manualTags = item.tags?.manual || [];
+        const allTags = [...autoTags, ...manualTags];
+
         modalContent.innerHTML = `
             <div class="p-2">
                 <div class="mb-6">
-                    <img 
-                        src="${item.imageUrl}" 
-                        alt="Item"
+                    <img
+                        src="${escapeHtml(item.imageUrl)}"
+                        alt="${escapeHtml(this.displayName(item))}"
                         class="w-full h-auto max-h-[70vh] object-contain rounded-lg shadow-lg"
-                        onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzk5YTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIG5vdCBmb3VuZDwvdGV4dD48L3N2Zz4='"
                     >
                 </div>
-                
                 ${allTags.length > 0 ? `
                     <div class="mb-4">
                         <h3 class="text-lg font-semibold text-gray-900 mb-3">Tags</h3>
                         <div class="flex flex-wrap gap-2">
-                            ${(item.tags.auto || []).map(tag => 
-                                `<span class="tag auto">${tag}</span>`
-                            ).join('')}
-                            ${(item.tags.manual || []).map(tag => 
-                                `<span class="tag manual">${tag}</span>`
-                            ).join('')}
+                            ${autoTags.map((tag) => `<span class="tag auto">${escapeHtml(tag)}</span>`).join('')}
+                            ${manualTags.map((tag) => `<span class="tag manual">${escapeHtml(tag)}</span>`).join('')}
                         </div>
                     </div>
                 ` : ''}
             </div>
         `;
-        
+
         modal.style.display = 'block';
         document.body.style.overflow = 'hidden';
     }
 
     closeModal() {
-        const modal = document.getElementById('itemModal');
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto';
+        document.getElementById('itemModal').style.display = 'none';
+        this.unlockBodyIfNoModals();
     }
 
     openAboutModal() {
-        const modal = document.getElementById('aboutModal');
-        modal.style.display = 'block';
+        document.getElementById('aboutModal').style.display = 'block';
         document.body.style.overflow = 'hidden';
     }
 
     closeAboutModal() {
-        const modal = document.getElementById('aboutModal');
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto';
+        document.getElementById('aboutModal').style.display = 'none';
+        this.unlockBodyIfNoModals();
     }
 
-    openFilterModal() {
-        const modal = document.getElementById('filterModal');
-        modal.style.display = 'block';
-        document.body.style.overflow = 'hidden';
-        this.updateFilterOptions();
+    closeAllModals() {
+        this.closeModal();
+        this.closeAboutModal();
     }
 
-    closeFilterModal() {
-        const modal = document.getElementById('filterModal');
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto';
-    }
-
-    toggleFilterOption(option) {
-        const type = option.dataset.type;
-        const value = option.dataset.value;
-        
-        if (this.activeFilters[type].includes(value)) {
-            this.activeFilters[type] = this.activeFilters[type].filter(v => v !== value);
-            option.classList.remove('active');
-        } else {
-            this.activeFilters[type].push(value);
-            option.classList.add('active');
+    unlockBodyIfNoModals() {
+        const itemOpen = document.getElementById('itemModal').style.display === 'block';
+        const aboutOpen = document.getElementById('aboutModal').style.display === 'block';
+        if (!itemOpen && !aboutOpen) {
+            document.body.style.overflow = 'auto';
         }
     }
 
     toggleFilterPill(pill) {
         const type = pill.dataset.type;
         const value = pill.dataset.value;
-        
+        if (!type || !value || !this.activeFilters[type]) return;
+
         if (this.activeFilters[type].includes(value)) {
-            this.activeFilters[type] = this.activeFilters[type].filter(v => v !== value);
+            this.activeFilters[type] = this.activeFilters[type].filter((v) => v !== value);
             pill.classList.remove('active');
+            pill.setAttribute('aria-pressed', 'false');
         } else {
             this.activeFilters[type].push(value);
             pill.classList.add('active');
+            pill.setAttribute('aria-pressed', 'true');
         }
-        
-        this.filterItemsWithoutAnimation();
-    }
 
-    updateFilterOptions() {
-        // Update filter option states based on active filters
-        document.querySelectorAll('.filter-option').forEach(option => {
-            const type = option.dataset.type;
-            const value = option.dataset.value;
-            
-            if (this.activeFilters[type].includes(value)) {
-                option.classList.add('active');
-            } else {
-                option.classList.remove('active');
-            }
-        });
-    }
-
-    applyFilters() {
         this.filterItems();
-        this.closeFilterModal();
     }
 
     clearAllFilters() {
-        this.activeFilters = {
-            color: [],
-            size: [],
-            room: [],
-            price: []
-        };
-        
-        // Update UI - clear both old filter options and new filter pills
-        document.querySelectorAll('.filter-option').forEach(option => {
-            option.classList.remove('active');
-        });
-        
-        document.querySelectorAll('.filter-pill').forEach(pill => {
+        this.activeFilters = { color: [], size: [], room: [], price: [] };
+        this.searchQuery = '';
+
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) searchInput.value = '';
+
+        document.querySelectorAll('.filter-pill').forEach((pill) => {
             if (pill.id !== 'clearAllFilters') {
                 pill.classList.remove('active');
+                pill.setAttribute('aria-pressed', 'false');
             }
         });
-        
-        // Filter items without animation to prevent overlay
-        this.filterItemsWithoutAnimation();
-    }
 
-    filterItems() {
-        const gridContainer = document.getElementById('gridContainer');
-        
-        // Add filtering animation
-        gridContainer.style.opacity = '0.5';
-        gridContainer.style.transform = 'scale(0.98)';
-        
-        setTimeout(() => {
-            this.filteredItems = this.items.filter(item => {
-                return this.itemMatchesFilters(item);
-            });
-            
-            this.currentPage = 0;
-            this.hasMoreItems = this.filteredItems.length > 0;
-            
-            this.renderItems();
-            this.updateActiveFiltersDisplay();
-            
-            // Complete animation - ensure opacity is fully reset
-            gridContainer.style.opacity = '1';
-            gridContainer.style.transform = 'scale(1)';
-            
-            // Double-check that opacity is reset after a short delay
-            setTimeout(() => {
-                gridContainer.style.opacity = '1';
-                gridContainer.style.transform = 'scale(1)';
-            }, 50);
-        }, 200);
-    }
-
-    filterItemsWithoutAnimation() {
-        const gridContainer = document.getElementById('gridContainer');
-        
-        // Ensure grid container is fully visible
-        gridContainer.style.opacity = '1';
-        gridContainer.style.transform = 'scale(1)';
-        
-        this.filteredItems = this.items.filter(item => {
-            return this.itemMatchesFilters(item);
-        });
-        
-        this.currentPage = 0;
-        this.hasMoreItems = this.filteredItems.length > 0;
-        
-        this.renderItems();
-        this.updateActiveFiltersDisplay();
-    }
-
-    itemMatchesFilters(item) {
-        const allTags = [...(item.tags.auto || []), ...(item.tags.manual || [])];
-        
-        // Check color filter
-        if (this.activeFilters.color.length > 0) {
-            const itemColor = this.getTagValue(item, 'color');
-            if (!itemColor || !this.activeFilters.color.includes(itemColor.toLowerCase())) {
-                return false;
-            }
-        }
-        
-        // Check size filter
-        if (this.activeFilters.size.length > 0) {
-            const itemSize = this.getTagValue(item, 'size');
-            if (!itemSize || !this.activeFilters.size.includes(itemSize.toLowerCase())) {
-                return false;
-            }
-        }
-        
-        // Check room filter
-        if (this.activeFilters.room.length > 0) {
-            const itemRoom = this.getTagValue(item, 'room');
-            if (!itemRoom || !this.activeFilters.room.includes(itemRoom.toLowerCase())) {
-                return false;
-            }
-        }
-        
-        // Check price filter
-        if (this.activeFilters.price.length > 0) {
-            const itemPrice = parseFloat(this.getTagValue(item, 'price')) || 0;
-            let priceMatches = false;
-            
-            for (const priceRange of this.activeFilters.price) {
-                if (priceRange === '0-25' && itemPrice >= 0 && itemPrice <= 25) priceMatches = true;
-                else if (priceRange === '25-50' && itemPrice > 25 && itemPrice <= 50) priceMatches = true;
-                else if (priceRange === '50-100' && itemPrice > 50 && itemPrice <= 100) priceMatches = true;
-                else if (priceRange === '100-200' && itemPrice > 100 && itemPrice <= 200) priceMatches = true;
-                else if (priceRange === '200+' && itemPrice > 200) priceMatches = true;
-            }
-            
-            if (!priceMatches) return false;
-        }
-        
-        return true;
-    }
-
-    updateActiveFiltersDisplay() {
-        const activeFiltersDiv = document.getElementById('activeFilters');
-        const filterChipsDiv = document.getElementById('filterChips');
-        const clearFiltersBtn = document.getElementById('clearFiltersBtn');
-        
-        // Clear existing chips
-        filterChipsDiv.innerHTML = '';
-        
-        // Check if any filters are active
-        const hasActiveFilters = Object.values(this.activeFilters).some(filters => filters.length > 0);
-        
-        if (hasActiveFilters) {
-            activeFiltersDiv.style.display = 'block';
-            clearFiltersBtn.style.display = 'inline-block';
-            
-            // Add filter chips
-            Object.entries(this.activeFilters).forEach(([type, values]) => {
-                values.forEach(value => {
-                    const chip = document.createElement('div');
-                    chip.className = 'filter-chip';
-                    chip.innerHTML = `
-                        ${type}: ${value}
-                        <span class="remove" data-type="${type}" data-value="${value}">&times;</span>
-                    `;
-                    
-                    // Add remove functionality
-                    chip.querySelector('.remove').addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        this.removeFilter(type, value);
-                    });
-                    
-                    filterChipsDiv.appendChild(chip);
-                });
-            });
-        } else {
-            activeFiltersDiv.style.display = 'none';
-            clearFiltersBtn.style.display = 'none';
-        }
-    }
-
-    removeFilter(type, value) {
-        this.activeFilters[type] = this.activeFilters[type].filter(v => v !== value);
         this.filterItems();
     }
 
-
-    setupInfiniteScroll() {
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting && this.hasMoreItems && !this.isLoading) {
-                    this.loadMoreItems();
-                }
-            });
-        }, {
-            rootMargin: '100px'
-        });
-
-        // Create a sentinel element for infinite scroll
-        const sentinel = document.createElement('div');
-        sentinel.id = 'scrollSentinel';
-        sentinel.className = 'h-4';
-        document.getElementById('gridContainer').appendChild(sentinel);
-        observer.observe(sentinel);
+    filterItems() {
+        this.filteredItems = this.items.filter((item) => this.itemMatchesFilters(item));
+        this.renderItems();
     }
 
-    async loadMoreItems() {
-        if (this.isLoading || !this.hasMoreItems) return;
-        
-        this.isLoading = true;
-        
-        // Simulate a small delay for better UX
-        await new Promise(resolve => setTimeout(resolve, 300));
-        
-        const gridContainer = document.getElementById('gridContainer');
-        const startIndex = this.currentPage * this.itemsPerPage;
-        const endIndex = Math.min(startIndex + this.itemsPerPage, this.filteredItems.length);
-        
-        for (let i = startIndex; i < endIndex; i++) {
-            const item = this.filteredItems[i];
-            this.createGridItem(item, gridContainer);
+    itemMatchesFilters(item) {
+        if (this.searchQuery && !this.itemSearchText(item).includes(this.searchQuery)) {
+            return false;
         }
-        
-        this.currentPage++;
-        this.hasMoreItems = endIndex < this.filteredItems.length;
-        this.isLoading = false;
+
+        if (this.activeFilters.color.length > 0) {
+            const itemColor = this.getTagValue(item, 'color');
+            if (!itemColor || !this.activeFilters.color.some((color) => itemColor.includes(color))) {
+                return false;
+            }
+        }
+
+        if (this.activeFilters.size.length > 0) {
+            const itemSize = this.getTagValue(item, 'size');
+            if (!itemSize || !this.activeFilters.size.includes(itemSize)) {
+                return false;
+            }
+        }
+
+        if (this.activeFilters.room.length > 0) {
+            const itemRoom = this.getTagValue(item, 'room');
+            if (!itemRoom || !this.activeFilters.room.includes(itemRoom.replace(/\s+/g, ''))) {
+                return false;
+            }
+        }
+
+        if (this.activeFilters.price.length > 0) {
+            const itemPrice = this.getTagValue(item, 'price');
+            if (!itemPrice || !this.activeFilters.price.includes(itemPrice)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     updateItemCount() {
         const countElement = document.getElementById('itemCount');
-        countElement.textContent = `${this.items.length} item${this.items.length !== 1 ? 's' : ''}`;
+        const total = this.items.length;
+        const shown = this.filteredItems.length;
+        const filtering = this.searchQuery || Object.values(this.activeFilters).some((values) => values.length > 0);
+
+        countElement.textContent = filtering
+            ? `${shown} of ${total} items`
+            : `${total} item${total !== 1 ? 's' : ''}`;
     }
 
     showLoading(show) {
-        const loadingState = document.getElementById('loadingState');
-        const gridContainer = document.getElementById('gridContainer');
-        
-        if (show) {
-            loadingState.style.display = 'flex';
-            gridContainer.style.display = 'none';
-        } else {
-            loadingState.style.display = 'none';
-            gridContainer.style.display = 'grid';
-        }
+        document.getElementById('loadingState').style.display = show ? 'flex' : 'none';
+        document.getElementById('gridContainer').style.display = show ? 'none' : 'grid';
+        if (show) document.getElementById('emptyState').style.display = 'none';
     }
 
-    showEmptyState(show) {
+    showEmptyState(show, hasItems = false) {
         const emptyState = document.getElementById('emptyState');
-        const gridContainer = document.getElementById('gridContainer');
-        
-        if (show) {
-            emptyState.style.display = 'block';
-            gridContainer.style.display = 'none';
-        } else {
-            emptyState.style.display = 'none';
-            gridContainer.style.display = 'grid';
-        }
-    }
+        const title = emptyState.querySelector('h3');
+        const copy = emptyState.querySelector('p');
 
-    resetGridContainerStyles() {
-        const gridContainer = document.getElementById('gridContainer');
-        if (gridContainer) {
-            gridContainer.style.opacity = '1';
-            gridContainer.style.transform = 'scale(1)';
+        if (show && hasItems) {
+            title.textContent = 'No matching items';
+            copy.textContent = 'Try clearing filters or searching for something else.';
+        } else {
+            title.textContent = 'No items found';
+            copy.textContent = 'Add some images to your Google Drive folder to get started.';
         }
+
+        emptyState.style.display = show ? 'block' : 'none';
+        document.getElementById('gridContainer').style.display = show ? 'none' : 'grid';
     }
 
     showError(message) {
-        // Create a simple error notification
         const errorDiv = document.createElement('div');
         errorDiv.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
         errorDiv.innerHTML = `
             <div class="flex items-center">
                 <i class="fas fa-exclamation-triangle mr-2"></i>
-                <span>${message}</span>
-                <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
+                <span>${escapeHtml(message)}</span>
+                <button type="button" class="ml-4 text-white hover:text-gray-200" aria-label="Dismiss">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
         `;
-        
+        errorDiv.querySelector('button').addEventListener('click', () => errorDiv.remove());
         document.body.appendChild(errorDiv);
-        
-        // Auto-remove after 5 seconds
-        setTimeout(() => {
-            if (errorDiv.parentElement) {
-                errorDiv.remove();
-            }
-        }, 5000);
+        setTimeout(() => errorDiv.remove(), 5000);
     }
 }
 
-// Initialize the app when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     new InventarApp();
 });
