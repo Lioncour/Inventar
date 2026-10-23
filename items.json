@@ -232,5 +232,24 @@
       ],
       "manual": []
     }
+  },
+  {
+    "id": "2026-10-23T13:13:20.982Z",
+    "name": "Skjerm liten",
+    "driveFileId": "1cvrbCoJ-aoVU7ZNYf-v5hAusGxLHY_dV",
+    "sourceName": "skjerm-liten-20261023-151047.jpg",
+    "imageUrl": "images/skjerm-liten-20261023-151047_processed.png",
+    "folderType": "inventar",
+    "category": "color",
+    "tags": {
+      "auto": [
+        "color:navy"
+      ],
+      "manual": [
+        "size:tiny",
+        "room:bedroom",
+        "price:cheap"
+      ]
+    }
   }
 ]
