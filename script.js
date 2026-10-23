@@ -121,7 +121,7 @@ class InventarApp {
 
     itemSearchText(item) {
         const tags = [...(item.tags?.auto || []), ...(item.tags?.manual || [])].join(' ');
-        return `${item.imageUrl || ''} ${item.sourceName || ''} ${item.category || ''} ${tags}`.toLowerCase();
+        return `${item.name || ''} ${item.imageUrl || ''} ${item.sourceName || ''} ${item.category || ''} ${tags}`.toLowerCase();
     }
 
     renderItems() {
@@ -138,16 +138,21 @@ class InventarApp {
 
     createGridItem(item, container) {
         const itemDiv = document.createElement('div');
-        itemDiv.className = 'grid-item cursor-pointer group';
+        itemDiv.className = 'grid-item';
+        const tags = [...(item.tags?.auto || []), ...(item.tags?.manual || [])];
+        const room = this.getTagValue(item, 'room');
         itemDiv.innerHTML = `
-            <div class="aspect-square overflow-hidden">
+            <div class="fp-frame">
                 <img
                     src="${escapeHtml(item.imageUrl)}"
                     alt="${escapeHtml(this.displayName(item))}"
-                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                     loading="lazy"
-                    onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5YTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIG5vdCBmb3VuZDwvdGV4dD48L3N2Zz4='"
+                    onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjRkZENUM3Ii8+PC9zdmc+'"
                 >
+            </div>
+            <div class="fp-meta">
+                <span class="fp-label">${escapeHtml(this.displayName(item))}</span>
+                <span class="fp-label fp-label--muted">${escapeHtml(room || (tags.length ? `${tags.length} tags` : ''))}</span>
             </div>
         `;
 
@@ -169,24 +174,18 @@ class InventarApp {
         const allTags = [...autoTags, ...manualTags];
 
         modalContent.innerHTML = `
-            <div class="p-2">
-                <div class="mb-6">
-                    <img
-                        src="${escapeHtml(item.imageUrl)}"
-                        alt="${escapeHtml(this.displayName(item))}"
-                        class="w-full h-auto max-h-[70vh] object-contain rounded-lg shadow-lg"
-                    >
-                </div>
-                ${allTags.length > 0 ? `
-                    <div class="mb-4">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-3">Tags</h3>
-                        <div class="flex flex-wrap gap-2">
-                            ${autoTags.map((tag) => `<span class="tag auto">${escapeHtml(tag)}</span>`).join('')}
-                            ${manualTags.map((tag) => `<span class="tag manual">${escapeHtml(tag)}</span>`).join('')}
-                        </div>
-                    </div>
-                ` : ''}
+            <div class="fp-label">${escapeHtml(item.category || 'item')}</div>
+            <h2 style="margin: 8px 0 24px;">${escapeHtml(this.displayName(item))}</h2>
+            <div class="fp-modal-image">
+                <img src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(this.displayName(item))}">
             </div>
+            ${allTags.length > 0 ? `
+                <div class="fp-label">Tags</div>
+                <div class="fp-tags">
+                    ${autoTags.map((tag) => `<span class="tag auto">${escapeHtml(tag)}</span>`).join('')}
+                    ${manualTags.map((tag) => `<span class="tag manual">${escapeHtml(tag)}</span>`).join('')}
+                </div>
+            ` : ''}
         `;
 
         modal.style.display = 'block';
@@ -333,15 +332,10 @@ class InventarApp {
 
     showError(message) {
         const errorDiv = document.createElement('div');
-        errorDiv.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+        errorDiv.className = 'fp-toast fp-toast--error';
         errorDiv.innerHTML = `
-            <div class="flex items-center">
-                <i class="fas fa-exclamation-triangle mr-2"></i>
-                <span>${escapeHtml(message)}</span>
-                <button type="button" class="ml-4 text-white hover:text-gray-200" aria-label="Dismiss">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
+            <span>${escapeHtml(message)}</span>
+            <button type="button" aria-label="Dismiss">×</button>
         `;
         errorDiv.querySelector('button').addEventListener('click', () => errorDiv.remove());
         document.body.appendChild(errorDiv);

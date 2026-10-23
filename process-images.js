@@ -124,7 +124,7 @@ class ImageProcessor {
             do {
                 const response = await this.drive.files.list({
                     q: `'${folderConfig.id}' in parents and mimeType contains 'image/' and trashed = false`,
-                    fields: 'nextPageToken, files(id, name, mimeType, createdTime)',
+                    fields: 'nextPageToken, files(id, name, mimeType, createdTime, description)',
                     orderBy: 'createdTime desc',
                     pageSize: 100,
                     pageToken,
@@ -145,6 +145,26 @@ class ImageProcessor {
             console.error(`Error fetching Google Drive images for ${folderType}:`, error.message);
             return [];
         }
+    }
+
+    // The Fototagger app writes the item's name and tags into the Drive file's description,
+    // one per line (commas work too): "name: Gul lampe", then "size:small", "room:kitchen", ...
+    // A "name:" line becomes the item's display name; everything else becomes a manual tag.
+    parseDescription(description) {
+        const result = { name: '', tags: [] };
+        if (!description) return result;
+        for (const part of String(description).split(/[\n,;]+/)) {
+            const entry = part.trim().replace(/\s+/g, ' ');
+            if (!entry) continue;
+            if (/^name\s*:/i.test(entry)) {
+                result.name = entry.replace(/^name\s*:\s*/i, '').trim().slice(0, 80);
+                continue;
+            }
+            const tag = entry.toLowerCase();
+            if (!result.tags.includes(tag)) result.tags.push(tag);
+        }
+        result.tags = result.tags.slice(0, 10);
+        return result;
     }
 
     detectCategory(fileName, availableCategories) {
@@ -263,9 +283,11 @@ class ImageProcessor {
                     const cut = cutResults.get(job.downloadedPath);
                     const processedPath = fs.existsSync(job.processedPath) ? job.processedPath : job.downloadedPath;
                     const autoTags = cut?.ok ? (cut.tags || []) : [];
+                    const fromDescription = this.parseDescription(job.image.description);
 
                     this.existingItems.push({
                         id: new Date().toISOString(),
+                        ...(fromDescription.name ? { name: fromDescription.name } : {}),
                         driveFileId: job.image.id,
                         sourceName: job.image.name,
                         imageUrl: `images/${path.basename(processedPath)}`,
@@ -273,7 +295,7 @@ class ImageProcessor {
                         category: job.image.category,
                         tags: {
                             auto: autoTags,
-                            manual: []
+                            manual: fromDescription.tags
                         }
                     });
 

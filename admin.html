@@ -3,306 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventar Admin - Manual Tagging</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Admin — Inventar — Flokroll Projects</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="flokroll.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
-        
-        * {
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Space Grotesk', sans-serif;
-            background: #0a0a0a;
-            color: #ffffff;
-            line-height: 1.4;
-        }
-        
-        .tag {
-            display: inline-block;
-            background: #000000;
-            color: #ffffff;
-            padding: 6px 12px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            margin: 2px;
-            border: 2px solid #000000;
-            font-family: 'JetBrains Mono', monospace;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .tag.auto {
-            background: #ff6b35;
-            color: #000000;
-        }
-        .tag.manual {
-            background: #ffffff;
-            color: #000000;
-            border-color: #000000;
-        }
-        .loading {
-            display: inline-block;
-            width: 24px;
-            height: 24px;
-            border: 4px solid #333333;
-            border-top: 4px solid #ff6b35;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        /* Brutalist Header */
-        header {
-            background: #000000;
-            border-bottom: 6px solid #ff6b35;
-            box-shadow: 0 4px 0 #ffffff;
-        }
-        
-        /* Brutalist Typography */
-        h1 {
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 800;
-            font-size: 2.5rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: #ff6b35;
-            text-shadow: 3px 3px 0 #ffffff;
-        }
-        
-        h2, h3, h4 {
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #000000;
-        }
-        
-        /* Brutalist Buttons */
-        button {
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            transition: all 0.2s ease-in-out;
-            border: 3px solid #000000;
-        }
-        
-        #logoutBtn {
-            background: #ff6b35;
-            color: #000000;
-            border: 3px solid #000000;
-            padding: 12px 20px;
-            font-size: 14px;
-        }
-        
-        #logoutBtn:hover {
-            background: #000000;
-            color: #ff6b35;
-            transform: translateY(-2px);
-        }
-        
-        button[onclick*="saveItem"] {
-            background: #000000;
-            color: #ffffff;
-            border: 3px solid #ffffff;
-            padding: 12px 20px;
-            font-size: 14px;
-        }
-        
-        button[onclick*="saveItem"]:hover {
-            background: #ff6b35;
-            color: #000000;
-            transform: translateY(-2px);
-        }
-        
-        /* Brutalist Form Elements */
-        input {
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 500;
-            border: 3px solid #000000;
-            background: #ffffff;
-            color: #000000;
-            padding: 12px 16px;
-        }
-        
-        input:focus {
-            outline: none;
-            border-color: #ff6b35;
-            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.3);
-        }
-        
-        /* Brutalist Cards */
-        .bg-white {
-            background: #ffffff !important;
-            border: 3px solid #000000;
-        }
-        
-        .text-gray-900 {
-            color: #000000 !important;
-        }
-        
-        .text-gray-700 {
-            color: #333333 !important;
-        }
-        
-        .text-gray-600 {
-            color: #666666 !important;
-        }
-        
-        .text-gray-500 {
-            color: #999999 !important;
-        }
-        
-        /* Brutalist Backgrounds */
-        .bg-gray-50 {
-            background: #0a0a0a !important;
-        }
-        
-        .bg-blue-50 {
-            background: #ff6b35 !important;
-            color: #000000 !important;
-            border: 3px solid #000000;
-        }
-        
-        .bg-blue-100 {
-            background: #000000 !important;
-            color: #ff6b35 !important;
-        }
-        
-        .border-blue-200 {
-            border-color: #000000 !important;
-        }
-        
-        .text-blue-800 {
-            color: #000000 !important;
-        }
-        
-        .text-blue-900 {
-            color: #000000 !important;
-        }
-        
-        /* Brutalist Modal */
-        .modal {
-            background-color: rgba(0,0,0,0.95);
-        }
-        
-        .modal-content {
-            background: #ffffff;
-            border: 4px solid #000000;
-            box-shadow: 0 0 0 4px #ff6b35, 0 20px 40px rgba(0, 0, 0, 0.5);
-        }
-        
-        .close {
-            background: #ff6b35;
-            color: #000000;
-            border: 3px solid #000000;
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 800;
-        }
-        
-        .close:hover {
-            background: #000000;
-            color: #ff6b35;
-        }
-        
-        /* Brutalist Images */
-        img {
-            border: 3px solid #000000;
-        }
+        .fp-login { min-height: 100vh; display: grid; place-items: center; padding: 24px; background: var(--fp-hair); }
+        .fp-login__box { background: var(--fp-bone); border: var(--fp-weight); padding: 32px; width: 100%; max-width: 400px; }
+        .fp-login__box h2 { margin: 8px 0 24px; }
+        .fp-login__box label { display: block; margin-bottom: 8px; }
+        .fp-login__box .fp-input { max-width: none; margin-bottom: 24px; }
+        .fp-admin-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1px; background: var(--fp-ink); border-bottom: var(--fp-hairline); }
+        .fp-card { background: var(--fp-bone); padding: 0 0 16px; display: flex; flex-direction: column; gap: 8px; }
+        .fp-card .fp-frame { aspect-ratio: 4 / 3; background: var(--fp-shell); border-bottom: var(--fp-hairline); }
+        .fp-card .fp-frame img { width: 100%; height: 100%; object-fit: contain; }
+        .fp-card > :not(.fp-frame) { margin-left: 16px; margin-right: 16px; }
+        .fp-card .fp-input { max-width: none; }
+        .fp-card .fp-btn { margin-top: 8px; }
+        .fp-instructions { padding: 24px var(--fp-gutter); border-bottom: var(--fp-hairline); max-width: 60em; }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
-    <!-- Login Modal -->
-    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">Admin Access</h2>
+<body>
+    <div id="loginModal" class="fp-login">
+        <div class="fp-login__box">
+            <span class="fp-brand"><span class="fp-roll" aria-hidden="true"></span><span class="fp-brand__word">Flokroll</span><span class="fp-brand__site">Inventar</span></span>
+            <h2>Admin</h2>
             <form id="loginForm">
-                <div class="mb-4">
-                    <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
-                    <input 
-                        type="password" 
-                        id="password" 
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        required
-                    >
-                </div>
-                <button 
-                    type="submit" 
-                    class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                    Access Admin Panel
-                </button>
+                <label for="password" class="fp-label">Password</label>
+                <input type="password" id="password" class="fp-input" required autocomplete="current-password">
+                <button type="submit" class="fp-btn fp-btn--full"><span>Open admin</span></button>
             </form>
-            <div id="loginError" class="mt-4 text-red-600 text-sm text-center hidden">
+            <div id="loginError" class="fp-error hidden" style="font: 500 13px/1.4 var(--fp-mono); color: var(--fp-danger); margin-top: 16px;">
                 Invalid password. Please try again.
             </div>
         </div>
     </div>
 
-    <!-- Main Admin Interface -->
     <div id="adminContent" class="hidden">
-        <!-- Header -->
-        <header class="bg-white shadow-sm border-b border-gray-200">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between items-center py-6">
-                    <div class="flex items-center">
-                        <h1 class="text-3xl font-bold text-gray-900">Inventar Admin</h1>
-                        <span class="ml-3 text-sm text-gray-500">Manual Tagging</span>
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        <span id="itemCount" class="text-sm text-gray-500">Loading...</span>
-                        <button id="downloadJsonBtn" class="bg-black text-white px-4 py-2 rounded-md">
-                            Download items.json
-                        </button>
-                        <button id="logoutBtn" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700">
-                            <i class="fas fa-sign-out-alt mr-2"></i>Logout
-                        </button>
-                    </div>
-                </div>
-            </div>
+        <header class="fp-header">
+            <a class="fp-brand" href="index.html">
+                <span class="fp-roll" aria-hidden="true"></span>
+                <span class="fp-brand__word">Flokroll</span>
+                <span class="fp-brand__site">Inventar · Admin</span>
+            </a>
+            <nav class="fp-nav">
+                <span id="itemCount" class="fp-label">Loading…</span>
+                <button id="downloadJsonBtn" type="button">Download items.json</button>
+                <button id="logoutBtn" type="button">Log out</button>
+            </nav>
         </header>
 
-        <!-- Main Content -->
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <!-- Instructions -->
-            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <i class="fas fa-info-circle text-blue-400"></i>
-                    </div>
-                    <div class="ml-3">
-                        <h3 class="text-sm font-medium text-blue-800">Instructions</h3>
-                        <div class="mt-2 text-sm text-blue-700">
-                            <p>Add custom tags for each item, for example: size:large, color:blue, price:cheap, room:bedroom. Changes are saved in this browser immediately. Download items.json and commit it to keep tags on the live site for everyone.</p>
-                        </div>
-                    </div>
-                </div>
+        <main>
+            <div class="fp-instructions">
+                <div class="fp-label">Manual tagging</div>
+                <p>Add tags per item, for example <code>size:large</code>, <code>color:blue</code>, <code>price:cheap</code>, <code>room:bedroom</code>. Changes are saved in this browser immediately. Download <code>items.json</code> and commit it to publish the tags for everyone.</p>
             </div>
 
-            <!-- Loading State -->
-            <div id="loadingState" class="flex justify-center items-center py-12">
+            <div id="loadingState" class="fp-state">
                 <div class="loading"></div>
-                <span class="ml-3 text-gray-600">Loading items...</span>
+                <span>Loading items</span>
             </div>
 
-            <!-- Items Grid -->
-            <div id="itemsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" style="display: none;">
-                <!-- Items will be dynamically loaded here -->
-            </div>
+            <div id="itemsGrid" class="fp-admin-grid" style="display: none;"></div>
 
-            <!-- Empty State -->
-            <div id="emptyState" class="text-center py-12" style="display: none;">
-                <div class="text-gray-400 mb-4">
-                    <i class="fas fa-box-open text-6xl"></i>
-                </div>
-                <h3 class="text-xl font-semibold text-gray-600 mb-2">No items found</h3>
-                <p class="text-gray-500">Add some images to your Google Drive folder to get started.</p>
+            <div id="emptyState" class="fp-state fp-state--block" style="display: none;">
+                <h3>No items found</h3>
+                <p>Add some images to your Google Drive folder to get started.</p>
             </div>
         </main>
+
+        <footer class="fp-footer">
+            <span class="fp-brand"><span class="fp-roll fp-roll--ink" aria-hidden="true"></span><span class="fp-brand__word">Flokroll</span></span>
+            <span class="fp-label">Flokroll Projects — Verksted V1.0</span>
+        </footer>
     </div>
 
     <script>
@@ -446,40 +220,34 @@
 
             createItemCard(item, index, container) {
                 const cardDiv = document.createElement('div');
-                cardDiv.className = 'bg-white rounded-lg shadow-sm border border-gray-200 p-6';
+                cardDiv.className = 'fp-card';
                 const autoTags = item.tags?.auto || [];
                 const manualTags = item.tags?.manual || [];
                 const allTags = [...autoTags, ...manualTags];
 
                 cardDiv.innerHTML = `
-                    <div class="mb-4">
-                        <img
-                            src="${escapeHtml(item.imageUrl)}"
-                            alt="${escapeHtml(item.id)}"
-                            class="w-full h-48 object-cover rounded-lg"
-                        >
+                    <div class="fp-frame">
+                        <img src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.name || item.sourceName || item.id)}" loading="lazy">
                     </div>
-                    <div class="mb-4">
-                        <h3 class="text-sm font-medium text-gray-900 mb-2">${escapeHtml(item.folderType || 'item')} · ${escapeHtml(item.category || 'uncategorized')}</h3>
-                        <p class="text-xs text-gray-500">Added: ${escapeHtml(new Date(item.id).toLocaleDateString())}</p>
+                    <div class="fp-meta" style="padding: 8px 0 0;">
+                        <span class="fp-label" style="color: var(--fp-ink);">${escapeHtml(item.folderType || 'item')} · ${escapeHtml(item.category || 'uncategorized')}</span>
+                        <span class="fp-label fp-label--muted">${escapeHtml(isNaN(Date.parse(item.id)) ? '' : new Date(item.id).toLocaleDateString())}</span>
                     </div>
+                    <h3>${escapeHtml(item.name || (item.sourceName || item.imageUrl || '').split('/').pop().replace(/_processed/g, '').replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' '))}</h3>
                     ${allTags.length > 0 ? `
-                        <div class="mb-4">
-                            <h4 class="text-sm font-medium text-gray-700 mb-2">Current Tags</h4>
-                            <div class="flex flex-wrap gap-1">
-                                ${autoTags.map((tag) => `<span class="tag auto">${escapeHtml(tag)}</span>`).join('')}
-                                ${manualTags.map((tag) => `<span class="tag manual">${escapeHtml(tag)}</span>`).join('')}
-                            </div>
+                        <div class="fp-tags" style="margin-top: 0;">
+                            ${autoTags.map((tag) => `<span class="tag auto">${escapeHtml(tag)}</span>`).join('')}
+                            ${manualTags.map((tag) => `<span class="tag manual">${escapeHtml(tag)}</span>`).join('')}
                         </div>
                     ` : ''}
-                    <div class="mb-4">
-                        <label for="manualTags_${index}" class="block text-sm font-medium text-gray-700 mb-2">
-                            Manual Tags (comma-separated)
+                    <div>
+                        <label for="manualTags_${index}" class="fp-label" style="display:block; margin-bottom: 8px;">
+                            Manual tags, comma-separated
                         </label>
                         <input
                             type="text"
                             id="manualTags_${index}"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            class="fp-input"
                             placeholder="e.g., size:large, color:blue, price:cheap, room:bedroom"
                             value="${escapeHtml((item.tags.manual || []).join(', '))}"
                             maxlength="200"
@@ -488,9 +256,9 @@
                     <button
                         type="button"
                         data-index="${index}"
-                        class="save-item-btn w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
+                        class="save-item-btn fp-btn fp-btn--full"
                     >
-                        Save Changes
+                        <span>Save</span>
                     </button>
                 `;
 
@@ -554,9 +322,9 @@
             }
 
             showNotification(message, type) {
-                const bgColor = type === 'error' ? 'bg-red-500' : 'bg-green-500';
+                const bgColor = type === 'error' ? 'fp-toast--error' : 'fp-toast--ok';
                 const notification = document.createElement('div');
-                notification.className = `fixed top-4 right-4 ${bgColor} text-white px-6 py-3 rounded-lg shadow-lg z-50`;
+                notification.className = `fp-toast ${bgColor}`;
                 notification.textContent = message;
                 document.body.appendChild(notification);
                 setTimeout(() => notification.remove(), 3000);

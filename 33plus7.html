@@ -3,480 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>33+7 - Capsule Wardrobe</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>33+7 — Flokroll Projects</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="flokroll.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap');
-        
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #fafafa;
-            color: #1a1a1a;
-            line-height: 1.6;
-            font-weight: 400;
-        }
-        
-        .category-section {
-            margin-bottom: 4px;
-        }
-        
+        .category-section { border-bottom: var(--fp-hairline); }
+        .category-grid { display: grid; grid-template-columns: 200px 1fr; }
+        @media (max-width: 700px) { .category-grid { grid-template-columns: 1fr; } }
         .category-title {
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 500;
-            font-size: 0.875rem;
-            text-transform: lowercase;
-            letter-spacing: 0.1em;
-            color: #666666;
-            height: auto;
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            padding: 8px 0;
-            margin-bottom: 8px;
-            position: relative;
+            font: 500 11px/1.4 var(--fp-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--fp-ink);
+            padding: 16px var(--fp-gutter); border-right: var(--fp-hairline);
         }
-        
-        .category-title::after {
-            content: '';
-            position: absolute;
-            right: -1px;
-            top: 0;
-            bottom: 0;
-            width: 1px;
-            background: linear-gradient(to bottom, transparent, #1a1a1a, transparent);
-        }
-        
-        .items-container {
-            display: flex;
-            overflow-x: auto;
-            gap: 24px;
-            padding: 8px 0 16px 0;
-            scroll-behavior: smooth;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-        
-        .items-container::-webkit-scrollbar {
-            display: none;
-        }
-        
-        .clothing-item {
-            flex-shrink: 0;
-            width: 126px;
-            height: 126px;
-            background: #ffffff;
-            border: 1px solid #e5e5e5;
-            transition: all 0.2s ease;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .clothing-item:hover {
-            transform: translateY(-2px);
-            border-color: #1a1a1a;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-        }
-        
-        .clothing-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.2s ease;
-        }
-        
-        .clothing-item:hover img {
-            transform: scale(1.02);
-        }
-        
-        .category-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 0;
-        }
-        
-        .hero-section {
-            text-align: left;
-            padding: 40px 20px 20px;
-            background: #ffffff;
-        }
-        
-        .hero-title {
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 600;
-            font-size: 2rem;
-            letter-spacing: -0.02em;
-            color: #1a1a1a;
-            margin-bottom: 0;
-        }
-        
-        .hero-subtitle {
-            font-size: 1rem;
-            color: #666666;
-            max-width: 500px;
-            margin: 0;
-            line-height: 1.6;
-            font-weight: 400;
-        }
-        
-        .capsule-explanation {
-            background: #f8f8f8;
-            color: #1a1a1a;
-            padding: 24px 20px;
-            margin: 20px 0;
-            border: 1px solid #e5e5e5;
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 500;
-            text-align: left;
-            position: relative;
-        }
-        
-        .capsule-explanation::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 40px;
-            height: 1px;
-            background: #1a1a1a;
-        }
-        
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #e5e5e5;
-            border-top: 2px solid #1a1a1a;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .empty-category {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 180px;
-            color: #999999;
-            font-style: italic;
-            border: 1px dashed #e5e5e5;
-            background: #fafafa;
-            font-size: 0.875rem;
-        }
-        
-        .scroll-hint {
-            position: absolute;
-            right: 24px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #999999;
-            font-size: 1.5rem;
-            opacity: 0.6;
-            transition: opacity 0.2s ease;
-        }
-        
-        .category-section:hover .scroll-hint {
-            opacity: 0;
-        }
-        
-        .nav {
-            background: #ffffff;
-            border-bottom: 1px solid #e5e5e5;
-        }
-        
-        .nav-link {
-            color: #666666;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.2s ease;
-        }
-        
-        .nav-link:hover {
-            color: #1a1a1a;
-        }
-        
-        .nav-label {
-            color: #1a1a1a;
-            font-size: 1.25rem;
-            font-weight: 600;
-            font-family: 'JetBrains Mono', monospace;
-        }
-        
-        .about-button {
-            background: #1a1a1a;
-            color: #ffffff;
-            border: none;
-            padding: 8px 16px;
-            font-size: 0.875rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border-radius: 4px;
-        }
-        
-        .about-button:hover {
-            background: #333333;
-            transform: translateY(-1px);
-        }
-        
-        .main-content {
-            padding: 0 20px 40px;
-        }
-        
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
-        }
-        
-        .modal-content {
-            background-color: #ffffff;
-            margin: 1% auto;
-            padding: 40px;
-            border: 1px solid #e5e5e5;
-            width: 98%;
-            max-width: 1400px;
-            max-height: 95vh;
-            position: relative;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            overflow-y: auto;
-        }
-        
-        .close {
-            color: #999999;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            transition: color 0.2s ease;
-        }
-        
-        .close:hover {
-            color: #1a1a1a;
-        }
-        
-        .modal h2 {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            color: #1a1a1a;
-        }
-        
-        .modal p {
-            margin-bottom: 16px;
-            line-height: 1.6;
-            color: #666666;
-        }
-        
-        .modal .rules {
-            background: #f8f8f8;
-            padding: 20px;
-            margin: 20px 0;
-            border-left: 4px solid #1a1a1a;
-        }
-        
-        .modal .links {
-            margin-top: 30px;
-        }
-        
-        .modal .links a {
-            color: #1a1a1a;
-            text-decoration: none;
-            font-weight: 500;
-            border-bottom: 1px solid #1a1a1a;
-            transition: all 0.2s ease;
-        }
-        
-        .modal .links a:hover {
-            color: #666666;
-            border-bottom-color: #666666;
-        }
-        
-        .loading-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 80px 0;
-            color: #666666;
-            font-size: 0.875rem;
-        }
-        
-        .loading-container span {
-            margin-left: 12px;
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 80px 0;
-            color: #999999;
-        }
-        
-        .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 16px;
-            opacity: 0.5;
-        }
-        
-        .empty-state h3 {
-            font-size: 1.125rem;
-            font-weight: 500;
-            margin-bottom: 8px;
-            color: #666666;
-        }
-        
-        .empty-state p {
-            font-size: 0.875rem;
-            line-height: 1.6;
-        }
-        
-        @media (max-width: 768px) {
-            .category-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .category-title {
-                writing-mode: horizontal-tb;
-                text-orientation: initial;
-                height: auto;
-                border-right: none;
-                border-bottom: 1px solid #e5e5e5;
-                padding-right: 0;
-                padding-bottom: 16px;
-                margin-right: 0;
-                margin-bottom: 24px;
-            }
-            
-            .category-title::after {
-                display: none;
-            }
-            
-            .main-content {
-                padding: 0 16px 60px;
-            }
-            
-            .hero-section {
-                padding: 100px 16px 60px;
-            }
-            
-            .hero-title {
-                font-size: 2rem;
-            }
-            
-            .capsule-explanation {
-                padding: 32px 16px;
-                margin: 32px 0;
-            }
-            
-            .modal-content {
-                width: 98%;
-                margin: 1% auto;
-                padding: 20px;
-                max-height: 95vh;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .modal-content {
-                width: 100%;
-                margin: 0;
-                padding: 15px;
-                max-height: 100vh;
-                border-radius: 0;
-            }
-        }
+        @media (max-width: 700px) { .category-title { border-right: 0; border-bottom: var(--fp-hairline); } }
+        .items-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1px; background: var(--fp-ink); border-left: var(--fp-hairline); }
+        @media (max-width: 700px) { .items-container { border-left: 0; grid-template-columns: repeat(2, 1fr); } }
+        .clothing-item { aspect-ratio: 1; background: var(--fp-shell); }
+        .clothing-item img { width: 100%; height: 100%; object-fit: contain; }
+        .rules p { margin-bottom: 8px; }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="nav fixed top-0 left-0 right-0 z-50">
-        <div class="px-6 lg:px-8">
-            <div class="flex justify-between items-center py-6">
-                <div class="nav-label">
-                    33+7
-                </div>
-                <div class="flex items-center gap-6">
-                    <span id="pieceCount" class="text-sm" style="color:#666666;"></span>
-                    <a href="index.html" class="nav-link">Inventar</a>
-                    <button class="about-button" type="button" onclick="openAboutModal()">About</button>
-                </div>
-            </div>
-        </div>
-    </nav>
+    <header class="fp-header">
+        <a class="fp-brand" href="index.html">
+            <span class="fp-roll" aria-hidden="true"></span>
+            <span class="fp-brand__word">Flokroll</span>
+            <span class="fp-brand__site">33+7</span>
+        </a>
+        <nav class="fp-nav">
+            <span id="pieceCount" class="fp-label"></span>
+            <a href="index.html">Inventar</a>
+            <button type="button" onclick="openAboutModal()">About</button>
+        </nav>
+    </header>
 
-    <!-- Hero Section -->
-    <section class="hero-section">
-        <h1 class="hero-title">33+7</h1>
+    <section class="fp-hero">
+        <h1><span class="fp-dev"><span class="fp-dev__ghost" aria-hidden="true">33+7</span><span class="fp-dev__real">33+7</span></span></h1>
+        <div class="fp-label">Capsule wardrobe — 33 core pieces, 7 seasonal</div>
     </section>
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Loading State -->
-        <div id="loadingState" class="loading-container">
+
+    <main>
+        <div id="loadingState" class="fp-state">
             <div class="loading"></div>
-            <span>Loading your capsule wardrobe...</span>
+            <span>Loading wardrobe</span>
         </div>
 
-        <!-- Categories Container -->
-        <div id="categoriesContainer" style="display: none;">
-            <!-- Categories will be dynamically loaded here -->
-        </div>
+        <div id="categoriesContainer" style="display: none;"></div>
 
-        <!-- Empty State -->
-        <div id="emptyState" class="empty-state" style="display: none;">
-            <i class="fas fa-tshirt"></i>
+        <div id="emptyState" class="fp-state fp-state--block" style="display: none;">
             <h3>No clothing found</h3>
             <p>Add some clothing images to your Google Drive folder to get started.</p>
         </div>
     </main>
 
-    <!-- Item Modal -->
+    <footer class="fp-footer">
+        <span class="fp-brand"><span class="fp-roll fp-roll--ink" aria-hidden="true"></span><span class="fp-brand__word">Flokroll</span></span>
+        <span class="fp-label">Flokroll Projects — Verksted V1.0</span>
+    </footer>
+
     <div id="itemModal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeItemModal()">&times;</span>
-            <div id="modalContent">
-                <!-- Modal content will be dynamically loaded here -->
-            </div>
+            <span class="close" onclick="closeItemModal()" role="button" aria-label="Close">×</span>
+            <div id="modalContent"></div>
         </div>
     </div>
 
-    <!-- About Modal -->
     <div id="aboutModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeAboutModal()">&times;</span>
-            <h2>About 33+7</h2>
-            <p>The 33+7 capsule wardrobe system is a minimalist approach to fashion that emphasizes quality over quantity and intentional choices over impulse purchases.</p>
-            
-            <div class="rules">
-                <h3 style="margin-bottom: 12px; font-family: 'JetBrains Mono', monospace;">The Rules</h3>
-                <p><strong>33 Core Pieces:</strong> Essential items that form the foundation of your wardrobe for 3 months. These are versatile, high-quality pieces that work together seamlessly.</p>
-                <p><strong>7 Seasonal Additions:</strong> Items that rotate throughout the year based on weather, occasions, or personal preference. These keep your wardrobe fresh and adaptable.</p>
-                <p><strong>Total: 40 Items Maximum</strong> - This constraint forces intentional choices and reduces decision fatigue while maximizing style and versatility.</p>
+        <div class="modal-content fp-modal-text">
+            <span class="close" onclick="closeAboutModal()" role="button" aria-label="Close">×</span>
+            <div class="fp-label">About</div>
+            <h2>33+7</h2>
+            <p class="fp-lead">A minimalist wardrobe: quality over quantity, intentional choices over impulse purchases.</p>
+
+            <div class="fp-section rules">
+                <h3>The rules</h3>
+                <p><strong>33 core pieces.</strong> Essential items that form the foundation of the wardrobe for three months. Versatile, high-quality pieces that work together.</p>
+                <p><strong>7 seasonal additions.</strong> Items that rotate through the year with weather, occasions or mood.</p>
+                <p><strong>40 items maximum.</strong> The constraint forces intentional choices and reduces decision fatigue.</p>
             </div>
-            
-            <p>This system promotes sustainable fashion, reduces waste, and helps you build a wardrobe that truly reflects your personal style.</p>
-            
-            <div class="links">
-                <p><strong>Visit my website:</strong> <a href="https://janandersekroll.no" target="_blank" rel="noopener noreferrer">janandersekroll.no</a></p>
+
+            <div class="fp-section">
+                <p><a href="https://janandersekroll.no" target="_blank" rel="noopener noreferrer">janandersekroll.no</a></p>
             </div>
         </div>
     </div>
@@ -630,6 +238,7 @@
                     <img
                         src="${escapeHtml(item.imageUrl)}"
                         alt="${escapeHtml(name)}"
+                        loading="lazy"
                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5YTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIG5vdCBmb3VuZDwvdGV4dD48L3N2Zz4='"
                     >
                 `;
@@ -647,23 +256,18 @@
                 const allTags = [...autoTags, ...manualTags];
 
                 modalContent.innerHTML = `
-                    <div style="padding: 20px;">
-                        <div style="margin-bottom: 20px;">
-                            <img
-                                src="${escapeHtml(item.imageUrl)}"
-                                alt="${escapeHtml(name)}"
-                                style="width: 100%; max-width: 1000px; max-height: 70vh; height: auto; object-fit: contain; border-radius: 8px; margin-bottom: 16px;"
-                            >
-                        </div>
-                        <h2 style="font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; margin-bottom: 16px; color: #1a1a1a;">
-                            ${escapeHtml(name)}
-                        </h2>
-                        ${allTags.length > 0 ? `
-                            <div style="display:flex;flex-wrap:wrap;gap:8px;">
-                                ${allTags.map((tag) => `<span class="tag" style="background:#f5f5f5;padding:4px 8px;font-size:12px;">${escapeHtml(tag)}</span>`).join('')}
-                            </div>
-                        ` : ''}
+                    <div class="fp-label">${escapeHtml(item.category || 'clothing')}</div>
+                    <h2 style="margin: 8px 0 24px;">${escapeHtml(name)}</h2>
+                    <div class="fp-modal-image">
+                        <img src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(name)}">
                     </div>
+                    ${allTags.length > 0 ? `
+                        <div class="fp-label">Tags</div>
+                        <div class="fp-tags">
+                            ${autoTags.map((tag) => `<span class="tag auto">${escapeHtml(tag)}</span>`).join('')}
+                            ${manualTags.map((tag) => `<span class="tag manual">${escapeHtml(tag)}</span>`).join('')}
+                        </div>
+                    ` : ''}
                 `;
 
                 modal.style.display = 'block';
@@ -683,7 +287,7 @@
 
             showError(message) {
                 const errorDiv = document.createElement('div');
-                errorDiv.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+                errorDiv.className = 'fp-toast fp-toast--error';
                 errorDiv.textContent = message;
                 document.body.appendChild(errorDiv);
                 setTimeout(() => errorDiv.remove(), 5000);

@@ -3,436 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventar - Personal Item Inventory</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
-        * {
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #ffffff;
-            color: #1a1a1a;
-            line-height: 1.6;
-        }
-        
-        .grid-item {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: none;
-            background: transparent;
-            border-radius: 0;
-            overflow: hidden;
-        }
-        .grid-item:hover {
-            transform: translateY(-2px) scale(1.01);
-        }
-        #gridContainer {
-            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            backdrop-filter: blur(8px);
-        }
-        .modal-content {
-            position: relative;
-            margin: 2% auto;
-            padding: 0;
-            width: 95%;
-            max-width: 1200px;
-            max-height: 90vh;
-            background: #ffffff;
-            border: none;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-        }
-        .close {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            color: #666666;
-            font-size: 24px;
-            font-weight: 400;
-            cursor: pointer;
-            z-index: 1001;
-            font-family: 'Inter', sans-serif;
-            background: #f5f5f5;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: none;
-            border-radius: 50%;
-            transition: all 0.2s ease;
-        }
-        .close:hover {
-            background: #e5e5e5;
-            color: #333333;
-        }
-        .loading {
-            display: inline-block;
-            width: 24px;
-            height: 24px;
-            border: 3px solid #e5e5e5;
-            border-top: 3px solid #666666;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .tag {
-            display: inline-block;
-            background: #f5f5f5;
-            color: #666666;
-            padding: 4px 8px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            margin: 2px;
-            border: none;
-            border-radius: 4px;
-            font-family: 'Inter', sans-serif;
-            text-transform: none;
-            letter-spacing: 0;
-        }
-        .tag.auto {
-            background: #e8f4fd;
-            color: #0066cc;
-        }
-        .tag.manual {
-            background: #f0f0f0;
-            color: #333333;
-        }
-        .filter-option {
-            padding: 8px 16px;
-            border: 1px solid #e5e5e5;
-            background: #ffffff;
-            color: #666666;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
-            font-family: 'Inter', sans-serif;
-            text-transform: none;
-            letter-spacing: 0;
-            border-radius: 6px;
-        }
-        .filter-option:hover {
-            background: #f5f5f5;
-            color: #333333;
-            border-color: #cccccc;
-        }
-        .filter-option.active {
-            background: #0066cc;
-            border-color: #0066cc;
-            color: #ffffff;
-        }
-        .filter-chip {
-            display: inline-flex;
-            align-items: center;
-            padding: 8px 16px;
-            background: #ff6b35;
-            color: #ffffff;
-            font-size: 12px;
-            font-weight: 600;
-            margin: 4px;
-            border: none;
-            border-radius: 20px;
-            font-family: 'Inter', sans-serif;
-            text-transform: none;
-            letter-spacing: 0;
-            box-shadow: 0 2px 4px rgba(255, 107, 53, 0.2);
-        }
-        .filter-chip .remove {
-            margin-left: 6px;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 14px;
-        }
-        .filter-chip .remove:hover {
-            color: #ffcc99;
-        }
-        
-        /* Filter Pills */
-        .filter-pill {
-            display: inline-flex;
-            align-items: center;
-            padding: 8px 16px;
-            background: #f5f5f5;
-            color: #666666;
-            font-size: 12px;
-            font-weight: 500;
-            margin: 2px;
-            border: none;
-            border-radius: 20px;
-            font-family: 'Inter', sans-serif;
-            text-transform: none;
-            letter-spacing: 0;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        .filter-pill:hover {
-            background: #e5e5e5;
-            color: #333333;
-        }
-        
-        .filter-pill.active {
-            background: #ff6b35;
-            color: #ffffff;
-            box-shadow: 0 2px 4px rgba(255, 107, 53, 0.2);
-        }
-        
-        .filter-pill.clear-btn {
-            background: #ff4757;
-            color: #ffffff;
-            font-weight: 600;
-        }
-        
-        .filter-pill.clear-btn:hover {
-            background: #ff3742;
-        }
-
-        .sr-only {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border: 0;
-        }
-        
-        /* Minimalist Header */
-        header {
-            background: #ffffff;
-            border-bottom: none;
-            box-shadow: none;
-        }
-        
-        /* Minimalist Buttons */
-        button {
-            font-family: 'Inter', sans-serif;
-            font-weight: 500;
-            text-transform: none;
-            letter-spacing: 0;
-            transition: all 0.2s ease-in-out;
-        }
-        
-        #filterBtn, #aboutBtn {
-            background: #ffffff;
-            color: #666666;
-            border: 1px solid #e5e5e5;
-            padding: 8px 16px;
-            font-size: 14px;
-            border-radius: 6px;
-        }
-        
-        #filterBtn:hover, #aboutBtn:hover {
-            background: #f5f5f5;
-            color: #333333;
-            border-color: #cccccc;
-        }
-        
-        #clearFiltersBtn {
-            background: #f5f5f5;
-            color: #666666;
-            border: 1px solid #e5e5e5;
-            padding: 6px 12px;
-            font-size: 12px;
-            border-radius: 4px;
-        }
-        
-        #clearFiltersBtn:hover {
-            background: #e5e5e5;
-            color: #333333;
-            border-color: #cccccc;
-        }
-        
-        /* Minimalist Grid */
-        #gridContainer {
-            gap: 4px;
-        }
-        
-        .grid-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border: none;
-        }
-        
-        /* Minimalist Typography */
-        h1 {
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            font-size: 2rem;
-            text-transform: none;
-            letter-spacing: 0;
-            color: #1a1a1a;
-        }
-        
-        #itemCount {
-            font-family: 'Inter', sans-serif;
-            font-weight: 400;
-            color: #666666;
-            font-size: 0.875rem;
-            text-transform: none;
-            letter-spacing: 0;
-        }
-        
-        /* Minimalist Modals */
-        .modal-content h2 {
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            text-transform: none;
-            letter-spacing: 0;
-            color: #1a1a1a;
-        }
-        
-        .modal-content h3 {
-            font-family: 'Inter', sans-serif;
-            font-weight: 500;
-            text-transform: none;
-            letter-spacing: 0;
-            color: #333333;
-        }
-        
-        /* Minimalist Form Elements */
-        input, select {
-            font-family: 'Inter', sans-serif;
-            font-weight: 400;
-            border: 1px solid #e5e5e5;
-            background: #ffffff;
-            color: #1a1a1a;
-            border-radius: 6px;
-        }
-        
-        input:focus, select:focus {
-            outline: none;
-            border-color: #0066cc;
-            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
-        }
-        
-        /* Minimalist Cards */
-        .bg-white {
-            background: #ffffff !important;
-            border: none;
-        }
-        
-        .text-gray-900 {
-            color: #1a1a1a !important;
-        }
-        
-        .text-gray-700 {
-            color: #333333 !important;
-        }
-        
-        .text-gray-600 {
-            color: #666666 !important;
-        }
-        
-        .text-gray-500 {
-            color: #999999 !important;
-        }
-        
-        /* Minimalist Backgrounds */
-        .bg-gray-50 {
-            background: #fafafa !important;
-        }
-        
-        .bg-blue-50 {
-            background: #e8f4fd !important;
-            color: #0066cc !important;
-        }
-        
-        .bg-blue-100 {
-            background: #f0f8ff !important;
-            color: #0066cc !important;
-        }
-        
-        .border-blue-200 {
-            border-color: #e5e5e5 !important;
-        }
-        
-        .text-blue-800 {
-            color: #0066cc !important;
-        }
-        
-        .text-blue-900 {
-            color: #1a1a1a !important;
-        }
-        
-        /* Responsive Modal */
-        @media (max-width: 768px) {
-            .modal-content {
-                width: 98%;
-                margin: 1% auto;
-                max-height: 95vh;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .modal-content {
-                width: 100%;
-                margin: 0;
-                max-height: 100vh;
-                border-radius: 0;
-            }
-        }
-    </style>
+    <title>Inventar — Flokroll Projects</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="flokroll.css">
 </head>
-<body class="bg-white min-h-screen">
-    <!-- Header -->
-    <header class="bg-white fixed top-0 left-0 right-0 z-40">
-        <div class="px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-4">
-                <div>
-                    <h1 class="text-3xl font-bold text-gray-900">Inventar</h1>
-                    <span id="itemCount" class="text-sm text-gray-500">Loading...</span>
-                </div>
-                <div class="flex items-center space-x-6">
-                    <a href="33plus7.html" class="text-gray-600 hover:text-gray-900 transition-colors font-medium">
-                        33+7
-                    </a>
-                    <button id="aboutBtn" type="button" class="text-gray-600 hover:text-gray-900 transition-colors font-medium">
-                        About
-                    </button>
-                </div>
-            </div>
-        </div>
+<body>
+    <header class="fp-header">
+        <a class="fp-brand" href="index.html">
+            <span class="fp-roll" aria-hidden="true"></span>
+            <span class="fp-brand__word">Flokroll</span>
+            <span class="fp-brand__site">Inventar</span>
+        </a>
+        <nav class="fp-nav">
+            <span id="itemCount" class="fp-label">Loading…</span>
+            <a href="33plus7.html">33+7</a>
+            <button id="aboutBtn" type="button">About</button>
+        </nav>
     </header>
 
-    <!-- Main Content -->
-    <main class="pt-24 px-4 sm:px-6 lg:px-8 pb-8">
-        <!-- Always Visible Filters -->
-        <div class="mb-6">
-            <div class="flex flex-wrap gap-3 items-center mb-3">
+    <section class="fp-hero">
+        <h1><span class="fp-dev"><span class="fp-dev__ghost" aria-hidden="true">Inventar</span><span class="fp-dev__real">Inventar</span></span></h1>
+        <div class="fp-label">Prosjekt — Things I own, cut out and tagged</div>
+    </section>
+
+    <main>
+        <div class="fp-toolbar">
+            <div>
                 <label for="searchInput" class="sr-only">Search items</label>
-                <input
-                    id="searchInput"
-                    type="search"
-                    placeholder="Search items..."
-                    class="w-full sm:w-72 px-3 py-2 text-sm border border-gray-200 rounded-md"
-                >
+                <input id="searchInput" class="fp-input" type="search" placeholder="SEARCH…">
             </div>
-            <div class="flex flex-wrap gap-3 items-center">
-                <span class="text-sm text-gray-600 font-medium">Filter by:</span>
-                <div class="flex flex-wrap gap-2">
+            <div class="fp-filter-group">
+                <div class="fp-filter-set">
+                    <span class="fp-label">Color</span>
                     <button class="filter-pill" data-type="color" data-value="red" aria-pressed="false">Red</button>
                     <button class="filter-pill" data-type="color" data-value="green" aria-pressed="false">Green</button>
                     <button class="filter-pill" data-type="color" data-value="blue" aria-pressed="false">Blue</button>
@@ -441,103 +45,81 @@
                     <button class="filter-pill" data-type="color" data-value="yellow" aria-pressed="false">Yellow</button>
                     <button class="filter-pill" data-type="color" data-value="colorful" aria-pressed="false">Colorful</button>
                 </div>
-                <div class="flex flex-wrap gap-2 ml-4">
+                <div class="fp-filter-set">
+                    <span class="fp-label">Size</span>
                     <button class="filter-pill" data-type="size" data-value="tiny" aria-pressed="false">Tiny</button>
                     <button class="filter-pill" data-type="size" data-value="small" aria-pressed="false">Small</button>
                     <button class="filter-pill" data-type="size" data-value="medium" aria-pressed="false">Medium</button>
                     <button class="filter-pill" data-type="size" data-value="large" aria-pressed="false">Large</button>
                 </div>
-                <div class="flex flex-wrap gap-2 ml-4">
+                <div class="fp-filter-set">
+                    <span class="fp-label">Room</span>
                     <button class="filter-pill" data-type="room" data-value="bedroom" aria-pressed="false">Bedroom</button>
                     <button class="filter-pill" data-type="room" data-value="livingroom" aria-pressed="false">Living Room</button>
                     <button class="filter-pill" data-type="room" data-value="kitchen" aria-pressed="false">Kitchen</button>
                     <button class="filter-pill" data-type="room" data-value="garage" aria-pressed="false">Garage</button>
                     <button class="filter-pill" data-type="room" data-value="outdoor" aria-pressed="false">Outdoor</button>
                 </div>
-                <div class="flex flex-wrap gap-2 ml-4">
+                <div class="fp-filter-set">
+                    <span class="fp-label">Price</span>
                     <button class="filter-pill" data-type="price" data-value="cheap" aria-pressed="false">Cheap</button>
                     <button class="filter-pill" data-type="price" data-value="not cheap" aria-pressed="false">Not Cheap</button>
                     <button class="filter-pill" data-type="price" data-value="expensive" aria-pressed="false">Expensive</button>
                 </div>
-                <button id="clearAllFilters" class="filter-pill clear-btn" type="button">Clear All</button>
+                <button id="clearAllFilters" class="filter-pill clear-btn" type="button">Clear all</button>
             </div>
         </div>
 
-        <!-- Loading State -->
-        <div id="loadingState" class="flex justify-center items-center py-12">
+        <div id="loadingState" class="fp-state">
             <div class="loading"></div>
-            <span class="ml-3 text-gray-600">Loading your inventory...</span>
+            <span>Loading inventory</span>
         </div>
 
-        <!-- Grid Container -->
-        <div id="gridContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-2 sm:gap-3 md:gap-4" style="display: none;">
-            <!-- Items will be dynamically loaded here -->
-        </div>
+        <div id="gridContainer" class="fp-grid" style="display: none;"></div>
 
-        <!-- Empty State -->
-        <div id="emptyState" class="text-center py-12" style="display: none;">
-            <div class="text-gray-400 mb-4">
-                <i class="fas fa-box-open text-6xl"></i>
-            </div>
-            <h3 class="text-xl font-semibold text-gray-600 mb-2">No items found</h3>
-            <p class="text-gray-500">Add some images to your Google Drive folder to get started.</p>
+        <div id="emptyState" class="fp-state fp-state--block" style="display: none;">
+            <h3>No items found</h3>
+            <p>Add some images to your Google Drive folder to get started.</p>
         </div>
     </main>
 
-    <!-- Item Modal -->
+    <footer class="fp-footer">
+        <span class="fp-brand"><span class="fp-roll fp-roll--ink" aria-hidden="true"></span><span class="fp-brand__word">Flokroll</span></span>
+        <span class="fp-label">Flokroll Projects — Verksted V1.0</span>
+    </footer>
+
     <div id="itemModal" class="modal">
         <div class="modal-content">
-            <span class="close">&times;</span>
-            <div id="modalContent">
-                <!-- Modal content will be dynamically loaded here -->
-            </div>
+            <span class="close" role="button" aria-label="Close">×</span>
+            <div id="modalContent"></div>
         </div>
     </div>
 
-    <!-- About Modal -->
     <div id="aboutModal" class="modal">
-        <div class="modal-content max-w-2xl">
-            <span class="close" id="aboutClose">&times;</span>
-            <div class="p-8">
-                <h2 class="text-3xl font-bold text-gray-900 mb-6">About Inventar</h2>
-                
-                <div class="space-y-6 text-gray-700">
-                    <p class="text-lg">
-                        <strong>Inventar</strong> is a personal item inventory system that automatically processes and organizes your belongings using AI and automation.
-                    </p>
-                    
-                    <div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-3">Features</h3>
-                        <ul class="space-y-2 list-disc list-inside">
-                            <li><strong>Automated Processing:</strong> Images are automatically downloaded from Google Drive and processed</li>
-                            <li><strong>Background Removal:</strong> High-quality local BiRefNet model in GitHub Actions, no paid API</li>
-                            <li><strong>Color tagging:</strong> Rough color from the processed photo; add your own tags in admin</li>
-                            <li><strong>Custom Tags:</strong> Add your own tags for size, color, price, and room location</li>
-                            <li><strong>Smart Sorting:</strong> Sort items by various criteria with smooth animations</li>
-                            <li><strong>Multi-Filter System:</strong> Filter by multiple criteria simultaneously</li>
-                            <li><strong>Responsive Design:</strong> Works perfectly on all devices</li>
-                        </ul>
-                    </div>
-                    
-                    <div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-3">How It Works</h3>
-                        <ol class="space-y-2 list-decimal list-inside">
-                            <li>Upload images to your designated Google Drive folder</li>
-                            <li>GitHub Actions automatically processes new images every hour</li>
-                            <li>Backgrounds are removed locally and a rough color tag is generated</li>
-                            <li>Items appear in your inventory with automatic updates</li>
-                            <li>Use the admin panel to add custom tags. Tags are saved in this browser and can be downloaded as items.json to commit.</li>
-                        </ol>
-                    </div>
-                    
-                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                        <h3 class="text-lg font-semibold text-blue-900 mb-2">Admin Panel</h3>
-                        <p class="text-blue-800">
-                            Access the admin panel at <code class="bg-blue-100 px-2 py-1 rounded">/admin.html</code> 
-                            to add custom tags and manage your inventory.
-                        </p>
-                    </div>
-                </div>
+        <div class="modal-content fp-modal-text">
+            <span class="close" id="aboutClose" role="button" aria-label="Close">×</span>
+            <div class="fp-label">About</div>
+            <h2>Inventar</h2>
+            <p class="fp-lead">A personal inventory. Photos go into a Google Drive folder, a job cuts out the background, and the things end up here with tags.</p>
+
+            <div class="fp-section">
+                <h3>How it works</h3>
+                <ol>
+                    <li>Take a photo with the Fototagger app, or drop an image into the Drive folder.</li>
+                    <li>Every hour a GitHub Action downloads new photos and removes the background with BiRefNet.</li>
+                    <li>A rough colour tag is read from the cut-out. Tags sent from the app are kept as manual tags.</li>
+                    <li>The item appears here. More tags can be added in the admin page.</li>
+                </ol>
+            </div>
+
+            <div class="fp-section">
+                <h3>Tags</h3>
+                <p>Tags are <code>key:value</code>. Filters exist for color, size, room and price. Anything else is searchable.</p>
+            </div>
+
+            <div class="fp-note">
+                <div class="fp-label">Admin</div>
+                <p>Open <code>/admin.html</code> to edit tags. Download <code>items.json</code> and commit it to publish them.</p>
             </div>
         </div>
     </div>

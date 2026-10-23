@@ -9,6 +9,10 @@ Personal inventory and capsule wardrobe site. Images are pulled from Google Driv
 - **Admin** (`admin.html`): add manual tags in the browser, then download `items.json` to commit
 - **Automation** (`process-images.js`): hourly GitHub Action downloads new Drive photos, removes backgrounds, and writes `items.json`
 
+## Look
+
+The pages follow the Flokroll Projects identity (`FLOKROLL-IDENTITY.md` in the mosaikk and onethingshop repos): bone background, ink edges, salmon as the single signal colour, Archivo Black / Archivo / IBM Plex Mono, no rounded corners and no shadows. Shared tokens and components live in `flokroll.css`; the pages carry only their own layout rules.
+
 ## Local preview
 
 ```bash
@@ -36,6 +40,8 @@ Manual tags use `key:value`, for example:
 - `size:large`
 - `room:bedroom`
 - `price:cheap`
+
+Tags can also arrive with the photo: if a Drive file has a description such as `size:small, room:kitchen, price:cheap` (one tag per line or comma-separated), the hourly job copies those into the item's manual tags. A line `name: Floor lamp` sets the item's display name. The Fototagger Android app writes both when it uploads.
 
 Admin saves tags in this browser immediately. Use **Download items.json** and commit the file so the live site has the same tags for everyone.
 
