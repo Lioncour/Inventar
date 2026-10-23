@@ -3,3 +3,5 @@ onnxruntime
 Pillow
 pymatting
 scipy
+numpy
+anthropic

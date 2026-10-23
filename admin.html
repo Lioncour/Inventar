@@ -234,6 +234,12 @@
                         <span class="fp-label fp-label--muted">${escapeHtml(isNaN(Date.parse(item.id)) ? '' : new Date(item.id).toLocaleDateString())}</span>
                     </div>
                     <h3>${escapeHtml(item.name || (item.sourceName || item.imageUrl || '').split('/').pop().replace(/_processed/g, '').replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' '))}</h3>
+                    ${item.cutout ? `
+                        <div class="fp-tags" style="margin-top: 0;">
+                            <span class="tag ${item.cutout.needsReview ? 'manual' : 'auto'}" title="${escapeHtml(item.cutout.model || '')}">cut ${escapeHtml(item.cutout.quality ? item.cutout.quality + '/5' : 'score ' + item.cutout.score)}${item.cutout.needsReview ? ' · check' : ''}</span>
+                            ${item.cutout.issues ? `<span class="fp-label">${escapeHtml(item.cutout.issues)}</span>` : ''}
+                        </div>
+                    ` : ''}
                     ${allTags.length > 0 ? `
                         <div class="fp-tags" style="margin-top: 0;">
                             ${autoTags.map((tag) => `<span class="tag auto">${escapeHtml(tag)}</span>`).join('')}

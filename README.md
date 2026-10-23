@@ -48,6 +48,6 @@ Admin saves tags in this browser immediately. Use **Download items.json** and co
 ## Notes
 
 - Filters only match items that actually have those tags. New items get a rough color tag from the processed photo; room/size/price tags are added in admin.
-- Background removal runs locally in GitHub Actions with rembg and the BiRefNet general model. There is no per-image API cost. First run downloads a large model and is cached afterwards.
+- Background removal runs locally in GitHub Actions with rembg. Each photo gets several candidate cut-outs (BiRefNet general with and without alpha matting, and ISNet general), stray specks are dropped and the result is cropped to the subject. The candidates are scored with mask heuristics; with an `ANTHROPIC_API_KEY` repository secret, Claude (`BG_JUDGE_MODEL`, default `claude-opus-5-5`) looks at them next to the original and picks the cleanest, rating it 1-5. The verdict is stored on the item as `cutout` and shown on the admin cards (`cut 4/5`, `check` when nothing was good). Without the secret the heuristics decide and nothing is paid. The models (about 1.1 GB) are downloaded on the first run and cached.
 - The workflow no longer runs on every `items.json` push, so processing commits cannot retrigger themselves.
 - Runtime packages are installed into `.ci-node` for the job only.

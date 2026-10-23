@@ -213,7 +213,7 @@ class ImageProcessor {
             args.push(job.input, job.output);
         }
 
-        console.log(`Running BiRefNet on ${jobs.length} image${jobs.length === 1 ? '' : 's'}...`);
+        console.log(`Cutting out ${jobs.length} image${jobs.length === 1 ? '' : 's'} (several candidates each, then a quality check)...`);
         const result = spawnSync(this.pythonCmd(), args, {
             encoding: 'utf8',
             stdio: ['ignore', 'pipe', 'inherit'],
@@ -284,6 +284,7 @@ class ImageProcessor {
                     const processedPath = fs.existsSync(job.processedPath) ? job.processedPath : job.downloadedPath;
                     const autoTags = cut?.ok ? (cut.tags || []) : [];
                     const fromDescription = this.parseDescription(job.image.description);
+                    const cutout = cut?.ok && cut.cutout ? cut.cutout : null;
 
                     this.existingItems.push({
                         id: new Date().toISOString(),
@@ -296,7 +297,8 @@ class ImageProcessor {
                         tags: {
                             auto: autoTags,
                             manual: fromDescription.tags
-                        }
+                        },
+                        ...(cutout ? { cutout } : {})
                     });
 
                     if (processedPath !== job.downloadedPath && fs.existsSync(job.downloadedPath)) {

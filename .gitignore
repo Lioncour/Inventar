@@ -72,3 +72,7 @@ google-credentials.json
 
 # Local development
 .u2net-models/
+
+# local test environment
+.venv/
+.tmp/

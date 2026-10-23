@@ -19,6 +19,10 @@ jobs:
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       BG_MODEL: birefnet-general
+      BG_SECOND_MODEL: isnet-general-use
+      # Optional: with this secret set, Claude compares the candidate cut-outs and picks the cleanest.
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      BG_JUDGE_MODEL: claude-opus-5-5
       U2NET_HOME: ${{ github.workspace }}/.u2net-models
 
     steps:
@@ -47,7 +51,7 @@ jobs:
         path: |
           .u2net-models
           ~/.cache/huggingface
-        key: rembg-birefnet-general-v1
+        key: rembg-birefnet-general-isnet-v2
 
     - name: Install Node dependencies
       run: npm install --prefix .ci-node --no-save --no-package-lock --no-audit --no-fund googleapis
