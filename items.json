@@ -251,5 +251,42 @@
         "price:cheap"
       ]
     }
+  },
+  {
+    "id": "2026-10-24T17:20:21.082Z",
+    "name": "Funnet kopp",
+    "driveFileId": "1xlWDtV9tnqPuXFxhrPhcHqz70RT2dfPc",
+    "sourceName": "funnet-kopp-20261024-191710.jpg",
+    "imageUrl": "images/funnet-kopp-20261024-191710_processed.png",
+    "folderType": "inventar",
+    "category": "color",
+    "tags": {
+      "auto": [
+        "color:colorful"
+      ],
+      "manual": [
+        "room:livingroom",
+        "size:tiny"
+      ]
+    },
+    "cutout": {
+      "model": "birefnet-general",
+      "method": "heuristic",
+      "score": 1,
+      "candidates": {
+        "A": {
+          "model": "birefnet-general",
+          "score": 1
+        },
+        "B": {
+          "model": "birefnet-general + alpha matting",
+          "score": 0.869
+        },
+        "C": {
+          "model": "isnet-general-use",
+          "score": 0.956
+        }
+      }
+    }
   }
 ]
